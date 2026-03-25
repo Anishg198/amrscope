@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}BioMolAMR — Zero-Shot AMR Prediction{% endblock %}
+{% block title %}AMRScope — Zero-Shot AMR Prediction{% endblock %}
 
 {% block content %}
 <!-- Hero -->
@@ -16,7 +16,7 @@
           Resistance Prediction
         </h1>
         <p class="hero-sub mt-3">
-          BioMolAMR predicts which drug classes resistance genes can confer resistance to —
+          AMRScope predicts which drug classes resistance genes can confer resistance to —
           including <strong>novel antibiotics never seen during training</strong> — using
           ESM-2 protein embeddings and molecular fingerprints.
         </p>
@@ -117,7 +117,7 @@
           </div>
           <div class="small">Graph topology provides no additional benefit. Direct protein–chemical
           compatibility scoring outperforms all GNN architectures including the proposed
-          BioMolAMR GAT model. Both feature types are jointly necessary.</div>
+          AMRScope GAT model. Both feature types are jointly necessary.</div>
         </div>
       </div>
 
@@ -203,7 +203,7 @@
 <script>
 fetch('/api/results').then(r=>r.json()).then(data=>{
   const models = data.models || [];
-  const labels = models.map(m=>m.name.replace('_',' ').replace('feature mlp','Feature-MLP').replace('rgcn bio','R-GCN Bio').replace('biomolamr','BioMolAMR'));
+  const labels = models.map(m=>m.name.replace('_',' ').replace('feature mlp','Feature-MLP').replace('rgcn bio','R-GCN Bio').replace('amrscope','AMRScope'));
   const vals   = models.map(m=>m.zs_all_mrr_mean || 0);
   const colors = vals.map(v => v >= 0.06 ? '#3fb950' : v >= 0.03 ? '#58a6ff' : '#8b949e');
   const ctx = document.getElementById('homeModelChart');

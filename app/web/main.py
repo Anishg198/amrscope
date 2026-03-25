@@ -1,5 +1,5 @@
 """
-BioMolAMR — FastAPI web application
+AMRScope — FastAPI web application
 Run:  uvicorn app.web.main:app --reload --port 8000
 """
 import sys, pickle, json
@@ -26,7 +26,7 @@ FIGS_DIR    = ROOT / "results/biomolamr/figures"
 DEVICE      = torch.device("cpu")
 
 # ── App ────────────────────────────────────────────────────────────────────────
-app = FastAPI(title="BioMolAMR")
+app = FastAPI(title="AMRScope")
 app.mount("/static",  StaticFiles(directory=str(WEB_DIR / "static")),   name="static")
 app.mount("/figures", StaticFiles(directory=str(FIGS_DIR)),              name="figures")
 templates = Jinja2Templates(directory=str(WEB_DIR / "templates"))
@@ -82,7 +82,7 @@ def startup():
 
 def _load_all_models():
     from src.models.baselines  import FeatureMLPBaseline, RGCNBaseline
-    from src.models.biomolamr  import BioMolAMR
+    from src.models.biomolamr  import BioMolAMR as AMRScope
 
     g = _graph_obj["hetero_data"]
     g_dim, d_dim, m_dim = (g["gene"].x.shape[1], g["drug_class"].x.shape[1],
@@ -91,7 +91,7 @@ def _load_all_models():
     specs = {
         "feature_mlp": MODELS_DIR / "feature_mlp_seed42.pt",
         "rgcn_bio":    MODELS_DIR / "rgcn_bio_seed42.pt",
-        "biomolamr":   MODELS_DIR / "biomolamr_seed42.pt",
+        "amrscope":   MODELS_DIR / "biomolamr_seed42.pt",
     }
     for name, path in specs.items():
         if not path.exists():
@@ -104,7 +104,7 @@ def _load_all_models():
         elif name == "rgcn_bio":
             m = RGCNBaseline(g_dim, d_dim, m_dim, hp["hidden_dim"], hp["out_dim"], hp["dropout"])
         else:
-            m = BioMolAMR(g_dim, d_dim, m_dim, hp["hidden_dim"], hp["out_dim"],
+            m = AMRScope(g_dim, d_dim, m_dim, hp["hidden_dim"], hp["out_dim"],
                           hp["num_heads"], hp["num_gat_layers"], hp["dropout"])
         m.load_state_dict(ck["state_dict"])
         m.eval()

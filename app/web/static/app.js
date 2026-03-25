@@ -1,5 +1,5 @@
 /**
- * BioMolAMR — shared frontend utilities
+ * AMRScope — shared frontend utilities
  * Loaded on every page via base.html
  */
 

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}About — BioMolAMR{% endblock %}
+{% block title %}About — AMRScope{% endblock %}
 
 {% block content %}
 <div class="container-xl py-5">
@@ -8,7 +8,7 @@
     <!-- Left column: paper summary -->
     <div class="col-lg-8">
 
-      <h1 class="section-title mb-1">About BioMolAMR</h1>
+      <h1 class="section-title mb-1">About AMRScope</h1>
       <p class="section-sub">Zero-Shot Antimicrobial Resistance Prediction via Protein–Chemical Compatibility</p>
 
       <!-- Abstract -->
@@ -26,7 +26,7 @@
           With this leakage removed, we show that clean pairwise compatibility scoring between
           ESM-2 protein embeddings and molecular fingerprints (Feature-MLP) achieves ZS-all MRR 0.069 —
           3.1× above a random baseline of 0.022 — outperforming graph neural network architectures including
-          our proposed BioMolAMR heterogeneous GAT model.
+          our proposed AMRScope heterogeneous GAT model.
           Ablation confirms both ESM-2 gene embeddings and molecular drug fingerprints are jointly necessary;
           removing either feature modality collapses performance to or below random.
           These results demonstrate that direct protein–chemical compatibility is sufficient and dominant
@@ -109,7 +109,7 @@
                 <td>0.027</td>
               </tr>
               <tr>
-                <td>BioMolAMR</td>
+                <td>AMRScope</td>
                 <td><span class="tag tag-zs">GNN</span></td>
                 <td>ESM-2 480d</td>
                 <td>MolFP 3245d</td>
@@ -170,8 +170,8 @@
       <!-- BibTeX -->
       <div class="card-dark">
         <h5 class="mb-3">Citation</h5>
-        <pre style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px;font-size:.8rem;overflow-x:auto;color:var(--text)">@inproceedings{biomolamr2025,
-  title   = {BioMolAMR: Zero-Shot Antimicrobial Resistance
+        <pre style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px;font-size:.8rem;overflow-x:auto;color:var(--text)">@inproceedings{amrscope2025,
+  title   = {AMRScope: Zero-Shot Antimicrobial Resistance
              Prediction via Protein--Chemical Compatibility},
   author  = {Gupta, Anish},
   booktitle={Proc. IEEE BIBM},

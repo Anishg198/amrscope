@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🦠 BioMolAMR
+# 🦠 AMRScope
 
 ### Antimicrobial Resistance Prediction Platform
 
@@ -16,9 +16,9 @@
 
 ---
 
-## What is BioMolAMR?
+## What is AMRScope?
 
-BioMolAMR is a **local web platform** for zero-shot antimicrobial resistance (AMR) prediction. Given a resistance gene, an antibiotic drug class, or even a novel drug SMILES string, it predicts resistance associations — including for antibiotic classes the model has **never seen during training**.
+AMRScope is a **local web platform** for zero-shot antimicrobial resistance (AMR) prediction. Given a resistance gene, an antibiotic drug class, or even a novel drug SMILES string, it predicts resistance associations — including for antibiotic classes the model has **never seen during training**.
 
 It combines:
 - **ESM-2** protein language model embeddings for resistance genes (480-dim)
@@ -49,14 +49,14 @@ A 2-layer MLP that scores gene–drug pairs using ESM-2 protein embeddings and m
 ### 🔷 R-GCN Bio
 Relational Graph Convolutional Network over the full CARD heterogeneous knowledge graph (genes, drug classes, resistance mechanisms). Typed edge convolutions per relation.
 
-### 🔶 BioMolAMR
+### 🔶 AMRScope
 Heterogeneous Graph Attention Network — gene encoder (ESM-2 → GAT), drug encoder (MolFP → GraphSAGE over Tanimoto similarity graph), mechanism-weighted decoder.
 
 | Model | ZS-all MRR | vs. Random (0.022) |
 |---|---|---|
 | Feature MLP | **0.069 ± 0.006** | **3.1×** |
 | R-GCN Bio | 0.027 ± 0.001 | 1.2× |
-| BioMolAMR | 0.019 ± 0.001 | ~1× |
+| AMRScope | 0.019 ± 0.001 | ~1× |
 
 > *ZS-all MRR: rank the zero-shot drug class among all 46 classes. Random baseline = 1/46 ≈ 0.022.*
 
@@ -67,8 +67,8 @@ Heterogeneous Graph Attention Network — gene encoder (ESM-2 → GAT), drug enc
 ### 1. Clone & install
 
 ```bash
-git clone https://github.com/yourusername/biomolamr.git
-cd biomolamr
+git clone https://github.com/yourusername/amrscope.git
+cd amrscope
 
 # Conda (recommended)
 conda env create -f environment.yml
@@ -217,14 +217,14 @@ POST /api/predict/compare
 ## Project Structure
 
 ```
-biomolamr/
+amrscope/
 ├── app/web/                  # FastAPI web application
 │   ├── main.py               # Backend — all routes and API endpoints
 │   ├── templates/            # Jinja2 HTML pages
 │   └── static/               # CSS + JS
 ├── src/
 │   ├── models/               # Model implementations
-│   │   ├── biomolamr.py      # BioMolAMR heterogeneous GAT
+│   │   ├── biomolamr.py      # Heterogeneous GAT heterogeneous GAT
 │   │   └── baselines.py      # Feature MLP, R-GCN, DistMult, TransE
 │   └── training/
 │       └── losses.py         # ListNet, structural alignment, focal losses

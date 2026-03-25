@@ -1,0 +1,1242 @@
+{
+  "glycopeptide antibiotic": {
+    "top_k": [
+      {
+        "gene_id": "3004945",
+        "gene_name": "Mycobacterium tuberculosis ald mutations confer resistance to cycloserine",
+        "score": -2.5276989936828613,
+        "is_true_positive": false,
+        "families": [
+          "cycloserine resistant ald"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3004157",
+        "gene_name": "Mycobacterium tuberculosis folC with mutation conferring resistance to para-aminosalicylic acid",
+        "score": -3.5691986083984375,
+        "is_true_positive": false,
+        "families": [
+          "aminosalicylate resistant dihydrofolate synthase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3004153",
+        "gene_name": "Mycobacterium tuberculosis thyA with mutation conferring resistance to para-aminosalicylic acid",
+        "score": -3.577446699142456,
+        "is_true_positive": false,
+        "families": [
+          "aminosalicylate resistant thymidylate synthase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3004941",
+        "gene_name": "Mycobacterium tuberculosis ddlA mutations confer resistance to cycloserine",
+        "score": -3.7557740211486816,
+        "is_true_positive": false,
+        "families": [
+          "cycloserine resistant ddlA"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3007854",
+        "gene_name": "Mycobacterium tuberculosis atpE with mutation conferring resistance to bedaquiline",
+        "score": -3.941999912261963,
+        "is_true_positive": false,
+        "families": [
+          "antibiotic resistant ATP synthase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003977",
+        "gene_name": "Halobacterium salinarum 16S rRNA mutation conferring resistance to pactamycin",
+        "score": -4.100811004638672,
+        "is_true_positive": false,
+        "families": [
+          "16S rRNA with mutation conferring resistance to pactamycin"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3007476",
+        "gene_name": "Mycobacterium abscessus atpE with mutation conferring resistance to bedaquiline",
+        "score": -4.175486087799072,
+        "is_true_positive": false,
+        "families": [
+          "antibiotic resistant ATP synthase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003756",
+        "gene_name": "Escherichia coli nfsB with mutation conferring resistance to nitrofurantoin",
+        "score": -4.319921970367432,
+        "is_true_positive": false,
+        "families": [
+          "Antibiotic resistant nfsB"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3007645",
+        "gene_name": "Clostridium sporogenes cplR",
+        "score": -4.424293518066406,
+        "is_true_positive": false,
+        "families": [
+          "Miscellaneous ABC-F subfamily ATP-binding cassette ribosomal protection proteins"
+        ],
+        "mechanisms": [
+          "antibiotic target protection"
+        ]
+      },
+      {
+        "gene_id": "3003357",
+        "gene_name": "Clostridioides difficile EF-Tu mutants conferring resistance to elfamycin",
+        "score": -4.448378086090088,
+        "is_true_positive": false,
+        "families": [
+          "elfamycin resistant EF-Tu"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3005081",
+        "gene_name": "Thermus thermophilus uL3 mutations conferring resistance to pleuromutilin antibiotics",
+        "score": -4.449345588684082,
+        "is_true_positive": false,
+        "families": [
+          "Ribosomal protein mutation conferring resistance to pleuromutilin antibiotics"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3005178",
+        "gene_name": "Mycobacterium tuberculosis ethA mutations conferring resistance to perchlozone",
+        "score": -4.469914436340332,
+        "is_true_positive": false,
+        "families": [
+          "perchlozone resistant ethA"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3004476",
+        "gene_name": "vmlR",
+        "score": -4.762954235076904,
+        "is_true_positive": false,
+        "families": [
+          "Miscellaneous ABC-F subfamily ATP-binding cassette ribosomal protection proteins"
+        ],
+        "mechanisms": [
+          "antibiotic target protection"
+        ]
+      },
+      {
+        "gene_id": "3003369",
+        "gene_name": "Escherichia coli EF-Tu mutants conferring resistance to Pulvomycin",
+        "score": -4.996857166290283,
+        "is_true_positive": false,
+        "families": [
+          "elfamycin resistant EF-Tu"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003370",
+        "gene_name": "Escherichia coli EF-Tu mutants conferring resistance to Enacyloxin IIa",
+        "score": -4.996857166290283,
+        "is_true_positive": false,
+        "families": [
+          "elfamycin resistant EF-Tu"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003368",
+        "gene_name": "Escherichia coli EF-Tu mutants conferring resistance to kirromycin",
+        "score": -4.996857166290283,
+        "is_true_positive": false,
+        "families": [
+          "elfamycin resistant EF-Tu"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003359",
+        "gene_name": "Streptomyces cinnamoneus EF-Tu mutants conferring resistance to elfamycin",
+        "score": -5.006109714508057,
+        "is_true_positive": false,
+        "families": [
+          "elfamycin resistant EF-Tu"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003361",
+        "gene_name": "Planobispora rosea EF-Tu mutants conferring resistance to inhibitor GE2270A",
+        "score": -5.196202278137207,
+        "is_true_positive": false,
+        "families": [
+          "elfamycin resistant EF-Tu"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003729",
+        "gene_name": "Staphylococcus aureus ileS with mutation conferring resistance to mupirocin",
+        "score": -5.2166266441345215,
+        "is_true_positive": false,
+        "families": [
+          "antibiotic-resistant isoleucyl-tRNA synthetase (ileS)"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003730",
+        "gene_name": "Bifidobacterium bifidum ileS conferring resistance to mupirocin",
+        "score": -5.3516411781311035,
+        "is_true_positive": false,
+        "families": [
+          "antibiotic-resistant isoleucyl-tRNA synthetase (ileS)"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      }
+    ],
+    "n_true_positives": 90,
+    "hits_at_k": 0,
+    "precision_at_k": 0.0,
+    "overlap_pct": 1
+  },
+  "glycylcycline": {
+    "top_k": [
+      {
+        "gene_id": "3004669",
+        "gene_name": "emtA",
+        "score": -0.6276429295539856,
+        "is_true_positive": false,
+        "families": [
+          "non-erm 23S ribosomal RNA methyltransferase (G748)"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003977",
+        "gene_name": "Halobacterium salinarum 16S rRNA mutation conferring resistance to pactamycin",
+        "score": -1.1709305047988892,
+        "is_true_positive": false,
+        "families": [
+          "16S rRNA with mutation conferring resistance to pactamycin"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003357",
+        "gene_name": "Clostridioides difficile EF-Tu mutants conferring resistance to elfamycin",
+        "score": -1.740302562713623,
+        "is_true_positive": false,
+        "families": [
+          "elfamycin resistant EF-Tu"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003359",
+        "gene_name": "Streptomyces cinnamoneus EF-Tu mutants conferring resistance to elfamycin",
+        "score": -2.015305995941162,
+        "is_true_positive": false,
+        "families": [
+          "elfamycin resistant EF-Tu"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003370",
+        "gene_name": "Escherichia coli EF-Tu mutants conferring resistance to Enacyloxin IIa",
+        "score": -2.1448936462402344,
+        "is_true_positive": false,
+        "families": [
+          "elfamycin resistant EF-Tu"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003368",
+        "gene_name": "Escherichia coli EF-Tu mutants conferring resistance to kirromycin",
+        "score": -2.1448936462402344,
+        "is_true_positive": false,
+        "families": [
+          "elfamycin resistant EF-Tu"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003369",
+        "gene_name": "Escherichia coli EF-Tu mutants conferring resistance to Pulvomycin",
+        "score": -2.1448936462402344,
+        "is_true_positive": false,
+        "families": [
+          "elfamycin resistant EF-Tu"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003361",
+        "gene_name": "Planobispora rosea EF-Tu mutants conferring resistance to inhibitor GE2270A",
+        "score": -2.5668084621429443,
+        "is_true_positive": false,
+        "families": [
+          "elfamycin resistant EF-Tu"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003438",
+        "gene_name": "Enterococcus faecium EF-Tu mutants conferring resistance to GE2270A",
+        "score": -2.626939058303833,
+        "is_true_positive": false,
+        "families": [
+          "elfamycin resistant EF-Tu"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3001313",
+        "gene_name": "facT",
+        "score": -3.1123530864715576,
+        "is_true_positive": false,
+        "families": [
+          "major facilitator superfamily (MFS) antibiotic efflux pump"
+        ],
+        "mechanisms": [
+          "antibiotic efflux"
+        ]
+      },
+      {
+        "gene_id": "3004476",
+        "gene_name": "vmlR",
+        "score": -3.222477436065674,
+        "is_true_positive": false,
+        "families": [
+          "Miscellaneous ABC-F subfamily ATP-binding cassette ribosomal protection proteins"
+        ],
+        "mechanisms": [
+          "antibiotic target protection"
+        ]
+      },
+      {
+        "gene_id": "3002813",
+        "gene_name": "lmrB",
+        "score": -3.4725091457366943,
+        "is_true_positive": false,
+        "families": [
+          "ATP-binding cassette (ABC) antibiotic efflux pump"
+        ],
+        "mechanisms": [
+          "antibiotic efflux"
+        ]
+      },
+      {
+        "gene_id": "3005178",
+        "gene_name": "Mycobacterium tuberculosis ethA mutations conferring resistance to perchlozone",
+        "score": -3.510303020477295,
+        "is_true_positive": false,
+        "families": [
+          "perchlozone resistant ethA"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3004173",
+        "gene_name": "Escherichia coli 23S rRNA with mutation conferring resistance to oxazolidinone antibiotics",
+        "score": -3.938045024871826,
+        "is_true_positive": false,
+        "families": [
+          "23S rRNA with mutation conferring resistance to oxazolidinone antibiotics"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3007854",
+        "gene_name": "Mycobacterium tuberculosis atpE with mutation conferring resistance to bedaquiline",
+        "score": -3.988935708999634,
+        "is_true_positive": false,
+        "families": [
+          "antibiotic resistant ATP synthase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3004470",
+        "gene_name": "poxtA",
+        "score": -4.017326354980469,
+        "is_true_positive": false,
+        "families": [
+          "Miscellaneous ABC-F subfamily ATP-binding cassette ribosomal protection proteins"
+        ],
+        "mechanisms": [
+          "antibiotic target protection"
+        ]
+      },
+      {
+        "gene_id": "3004153",
+        "gene_name": "Mycobacterium tuberculosis thyA with mutation conferring resistance to para-aminosalicylic acid",
+        "score": -4.156422138214111,
+        "is_true_positive": false,
+        "families": [
+          "aminosalicylate resistant thymidylate synthase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3004157",
+        "gene_name": "Mycobacterium tuberculosis folC with mutation conferring resistance to para-aminosalicylic acid",
+        "score": -4.176884651184082,
+        "is_true_positive": false,
+        "families": [
+          "aminosalicylate resistant dihydrofolate synthase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3005081",
+        "gene_name": "Thermus thermophilus uL3 mutations conferring resistance to pleuromutilin antibiotics",
+        "score": -4.18333101272583,
+        "is_true_positive": false,
+        "families": [
+          "Ribosomal protein mutation conferring resistance to pleuromutilin antibiotics"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003923",
+        "gene_name": "oqxB",
+        "score": -4.2692766189575195,
+        "is_true_positive": true,
+        "families": [
+          "resistance-nodulation-cell division (RND) antibiotic efflux pump"
+        ],
+        "mechanisms": [
+          "antibiotic efflux"
+        ]
+      }
+    ],
+    "n_true_positives": 35,
+    "hits_at_k": 1,
+    "precision_at_k": 0.05,
+    "overlap_pct": 100
+  },
+  "lincosamide antibiotic": {
+    "top_k": [
+      {
+        "gene_id": "3004599",
+        "gene_name": "clcD",
+        "score": 1.8899239301681519,
+        "is_true_positive": true,
+        "families": [
+          "Cfr 23S ribosomal RNA methyltransferase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3004669",
+        "gene_name": "emtA",
+        "score": 1.70229172706604,
+        "is_true_positive": true,
+        "families": [
+          "non-erm 23S ribosomal RNA methyltransferase (G748)"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003907",
+        "gene_name": "cipA",
+        "score": 1.375438928604126,
+        "is_true_positive": true,
+        "families": [
+          "Cfr 23S ribosomal RNA methyltransferase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3004476",
+        "gene_name": "vmlR",
+        "score": 1.2206015586853027,
+        "is_true_positive": true,
+        "families": [
+          "Miscellaneous ABC-F subfamily ATP-binding cassette ribosomal protection proteins"
+        ],
+        "mechanisms": [
+          "antibiotic target protection"
+        ]
+      },
+      {
+        "gene_id": "3004058",
+        "gene_name": "Staphylococcus aureus 23S rRNA with mutation conferring resistance to linezolid",
+        "score": 0.6262863874435425,
+        "is_true_positive": true,
+        "families": [
+          "23S rRNA with mutation conferring resistance to linezolid antibiotics"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003441",
+        "gene_name": "cfrA",
+        "score": 0.37278348207473755,
+        "is_true_positive": true,
+        "families": [
+          "Cfr 23S ribosomal RNA methyltransferase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3005023",
+        "gene_name": "cfrE",
+        "score": 0.1863936483860016,
+        "is_true_positive": true,
+        "families": [
+          "Cfr 23S ribosomal RNA methyltransferase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3002814",
+        "gene_name": "clbA",
+        "score": -0.012248109094798565,
+        "is_true_positive": true,
+        "families": [
+          "Cfr 23S ribosomal RNA methyltransferase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3002815",
+        "gene_name": "clbB",
+        "score": -0.11465302109718323,
+        "is_true_positive": true,
+        "families": [
+          "Cfr 23S ribosomal RNA methyltransferase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3002816",
+        "gene_name": "clbC",
+        "score": -0.16856512427330017,
+        "is_true_positive": true,
+        "families": [
+          "Cfr 23S ribosomal RNA methyltransferase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3007637",
+        "gene_name": "Clostridioides difficile cplR",
+        "score": -0.6101114153862,
+        "is_true_positive": true,
+        "families": [
+          "Miscellaneous ABC-F subfamily ATP-binding cassette ribosomal protection proteins"
+        ],
+        "mechanisms": [
+          "antibiotic target protection"
+        ]
+      },
+      {
+        "gene_id": "3004146",
+        "gene_name": "cfrC",
+        "score": -0.7667591571807861,
+        "is_true_positive": true,
+        "families": [
+          "Cfr 23S ribosomal RNA methyltransferase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3004173",
+        "gene_name": "Escherichia coli 23S rRNA with mutation conferring resistance to oxazolidinone antibiotics",
+        "score": -0.7885819673538208,
+        "is_true_positive": false,
+        "families": [
+          "23S rRNA with mutation conferring resistance to oxazolidinone antibiotics"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3005021",
+        "gene_name": "cfr(D)",
+        "score": -0.9738703966140747,
+        "is_true_positive": true,
+        "families": [
+          "Cfr 23S ribosomal RNA methyltransferase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3000522",
+        "gene_name": "ErmG",
+        "score": -1.1844425201416016,
+        "is_true_positive": true,
+        "families": [
+          "Erm 23S ribosomal RNA methyltransferase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3000596",
+        "gene_name": "ErmX",
+        "score": -1.1844425201416016,
+        "is_true_positive": true,
+        "families": [
+          "Erm 23S ribosomal RNA methyltransferase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003746",
+        "gene_name": "optrA",
+        "score": -1.2244126796722412,
+        "is_true_positive": false,
+        "families": [
+          "Miscellaneous ABC-F subfamily ATP-binding cassette ribosomal protection proteins"
+        ],
+        "mechanisms": [
+          "antibiotic target protection"
+        ]
+      },
+      {
+        "gene_id": "3000592",
+        "gene_name": "ErmN",
+        "score": -1.2452764511108398,
+        "is_true_positive": true,
+        "families": [
+          "Erm 23S ribosomal RNA methyltransferase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3000594",
+        "gene_name": "ErmR",
+        "score": -1.2923128604888916,
+        "is_true_positive": true,
+        "families": [
+          "Erm 23S ribosomal RNA methyltransferase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3000326",
+        "gene_name": "ErmE",
+        "score": -1.2923128604888916,
+        "is_true_positive": true,
+        "families": [
+          "Erm 23S ribosomal RNA methyltransferase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      }
+    ],
+    "n_true_positives": 108,
+    "hits_at_k": 18,
+    "precision_at_k": 0.9,
+    "overlap_pct": 56
+  },
+  "rifamycin antibiotic": {
+    "top_k": [
+      {
+        "gene_id": "3003756",
+        "gene_name": "Escherichia coli nfsB with mutation conferring resistance to nitrofurantoin",
+        "score": 2.5874834060668945,
+        "is_true_positive": false,
+        "families": [
+          "Antibiotic resistant nfsB"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3007849",
+        "gene_name": "Mycobacterium tuberculosis fgd1 with mutation conferring resistance to delamanid",
+        "score": 2.3679697513580322,
+        "is_true_positive": false,
+        "families": [
+          "delamanid-resistant fgd1"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3007059",
+        "gene_name": "Helicobacter pylori frxA mutation conferring resistance to metronidazole",
+        "score": 2.2293457984924316,
+        "is_true_positive": false,
+        "families": [
+          "Antibiotic resistant Helicobacter pylori nitroreductase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3007055",
+        "gene_name": "Helicobacter pylori rdxA mutation conferring resistance to metronidazole",
+        "score": 1.883352279663086,
+        "is_true_positive": false,
+        "families": [
+          "Antibiotic resistant Helicobacter pylori nitroreductase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3007661",
+        "gene_name": "Mycobacterium tuberculosis ddn mutation conferring resistance to nitroimidazole antibiotics",
+        "score": 1.376753568649292,
+        "is_true_positive": false,
+        "families": [
+          "antibiotic resistant Mycobacterium tuberculosis nitroreductase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3007109",
+        "gene_name": "nimG",
+        "score": 0.4960227906703949,
+        "is_true_positive": false,
+        "families": [
+          "nitroimidazole reductase"
+        ],
+        "mechanisms": [
+          "antibiotic inactivation"
+        ]
+      },
+      {
+        "gene_id": "3007108",
+        "gene_name": "nimF",
+        "score": 0.4960227906703949,
+        "is_true_positive": false,
+        "families": [
+          "nitroimidazole reductase"
+        ],
+        "mechanisms": [
+          "antibiotic inactivation"
+        ]
+      },
+      {
+        "gene_id": "3003751",
+        "gene_name": "Escherichia coli nfsA mutations conferring resistance to nitrofurantoin",
+        "score": 0.4615497887134552,
+        "is_true_positive": false,
+        "families": [
+          "antibiotic resistant nfsA"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3007111",
+        "gene_name": "nimI",
+        "score": 0.4591035544872284,
+        "is_true_positive": false,
+        "families": [
+          "nitroimidazole reductase"
+        ],
+        "mechanisms": [
+          "antibiotic inactivation"
+        ]
+      },
+      {
+        "gene_id": "3007110",
+        "gene_name": "nimH",
+        "score": 0.21577730774879456,
+        "is_true_positive": false,
+        "families": [
+          "nitroimidazole reductase"
+        ],
+        "mechanisms": [
+          "antibiotic inactivation"
+        ]
+      },
+      {
+        "gene_id": "3007113",
+        "gene_name": "nimK",
+        "score": 0.21577730774879456,
+        "is_true_positive": false,
+        "families": [
+          "nitroimidazole reductase"
+        ],
+        "mechanisms": [
+          "antibiotic inactivation"
+        ]
+      },
+      {
+        "gene_id": "3007104",
+        "gene_name": "nimA",
+        "score": 0.21577730774879456,
+        "is_true_positive": false,
+        "families": [
+          "nitroimidazole reductase"
+        ],
+        "mechanisms": [
+          "antibiotic inactivation"
+        ]
+      },
+      {
+        "gene_id": "3007107",
+        "gene_name": "nimE",
+        "score": 0.21577730774879456,
+        "is_true_positive": false,
+        "families": [
+          "nitroimidazole reductase"
+        ],
+        "mechanisms": [
+          "antibiotic inactivation"
+        ]
+      },
+      {
+        "gene_id": "3007106",
+        "gene_name": "nimD",
+        "score": 0.21577730774879456,
+        "is_true_positive": false,
+        "families": [
+          "nitroimidazole reductase"
+        ],
+        "mechanisms": [
+          "antibiotic inactivation"
+        ]
+      },
+      {
+        "gene_id": "3007105",
+        "gene_name": "nimC",
+        "score": 0.21577730774879456,
+        "is_true_positive": false,
+        "families": [
+          "nitroimidazole reductase"
+        ],
+        "mechanisms": [
+          "antibiotic inactivation"
+        ]
+      },
+      {
+        "gene_id": "3007112",
+        "gene_name": "nimJ",
+        "score": 0.21577730774879456,
+        "is_true_positive": false,
+        "families": [
+          "nitroimidazole reductase"
+        ],
+        "mechanisms": [
+          "antibiotic inactivation"
+        ]
+      },
+      {
+        "gene_id": "3004655",
+        "gene_name": "nimB",
+        "score": 0.21577730774879456,
+        "is_true_positive": false,
+        "families": [
+          "nitroimidazole reductase"
+        ],
+        "mechanisms": [
+          "antibiotic inactivation"
+        ]
+      },
+      {
+        "gene_id": "3003977",
+        "gene_name": "Halobacterium salinarum 16S rRNA mutation conferring resistance to pactamycin",
+        "score": -0.4204501807689667,
+        "is_true_positive": false,
+        "families": [
+          "16S rRNA with mutation conferring resistance to pactamycin"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3007671",
+        "gene_name": "Clostridioides difficile nimB",
+        "score": -0.68728107213974,
+        "is_true_positive": false,
+        "families": [
+          "nitroimidazole reductase"
+        ],
+        "mechanisms": [
+          "antibiotic inactivation"
+        ]
+      },
+      {
+        "gene_id": "3003950",
+        "gene_name": "msbA",
+        "score": -0.741367518901825,
+        "is_true_positive": false,
+        "families": [
+          "ATP-binding cassette (ABC) antibiotic efflux pump"
+        ],
+        "mechanisms": [
+          "antibiotic efflux"
+        ]
+      }
+    ],
+    "n_true_positives": 62,
+    "hits_at_k": 0,
+    "precision_at_k": 0.0,
+    "overlap_pct": 47
+  },
+  "streptogramin A antibiotic": {
+    "top_k": [
+      {
+        "gene_id": "3004669",
+        "gene_name": "emtA",
+        "score": 0.7738304734230042,
+        "is_true_positive": false,
+        "families": [
+          "non-erm 23S ribosomal RNA methyltransferase (G748)"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003977",
+        "gene_name": "Halobacterium salinarum 16S rRNA mutation conferring resistance to pactamycin",
+        "score": -0.7820302844047546,
+        "is_true_positive": false,
+        "families": [
+          "16S rRNA with mutation conferring resistance to pactamycin"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3004476",
+        "gene_name": "vmlR",
+        "score": -0.7901787757873535,
+        "is_true_positive": true,
+        "families": [
+          "Miscellaneous ABC-F subfamily ATP-binding cassette ribosomal protection proteins"
+        ],
+        "mechanisms": [
+          "antibiotic target protection"
+        ]
+      },
+      {
+        "gene_id": "3003357",
+        "gene_name": "Clostridioides difficile EF-Tu mutants conferring resistance to elfamycin",
+        "score": -1.1365736722946167,
+        "is_true_positive": false,
+        "families": [
+          "elfamycin resistant EF-Tu"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003359",
+        "gene_name": "Streptomyces cinnamoneus EF-Tu mutants conferring resistance to elfamycin",
+        "score": -1.2579602003097534,
+        "is_true_positive": false,
+        "families": [
+          "elfamycin resistant EF-Tu"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003368",
+        "gene_name": "Escherichia coli EF-Tu mutants conferring resistance to kirromycin",
+        "score": -1.632926106452942,
+        "is_true_positive": false,
+        "families": [
+          "elfamycin resistant EF-Tu"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003370",
+        "gene_name": "Escherichia coli EF-Tu mutants conferring resistance to Enacyloxin IIa",
+        "score": -1.632926106452942,
+        "is_true_positive": false,
+        "families": [
+          "elfamycin resistant EF-Tu"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003369",
+        "gene_name": "Escherichia coli EF-Tu mutants conferring resistance to Pulvomycin",
+        "score": -1.632926106452942,
+        "is_true_positive": false,
+        "families": [
+          "elfamycin resistant EF-Tu"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003361",
+        "gene_name": "Planobispora rosea EF-Tu mutants conferring resistance to inhibitor GE2270A",
+        "score": -1.6879754066467285,
+        "is_true_positive": false,
+        "families": [
+          "elfamycin resistant EF-Tu"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003438",
+        "gene_name": "Enterococcus faecium EF-Tu mutants conferring resistance to GE2270A",
+        "score": -1.7192816734313965,
+        "is_true_positive": false,
+        "families": [
+          "elfamycin resistant EF-Tu"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003907",
+        "gene_name": "cipA",
+        "score": -2.3195040225982666,
+        "is_true_positive": true,
+        "families": [
+          "Cfr 23S ribosomal RNA methyltransferase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3004599",
+        "gene_name": "clcD",
+        "score": -2.347820281982422,
+        "is_true_positive": true,
+        "families": [
+          "Cfr 23S ribosomal RNA methyltransferase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3007637",
+        "gene_name": "Clostridioides difficile cplR",
+        "score": -2.6829559803009033,
+        "is_true_positive": true,
+        "families": [
+          "Miscellaneous ABC-F subfamily ATP-binding cassette ribosomal protection proteins"
+        ],
+        "mechanisms": [
+          "antibiotic target protection"
+        ]
+      },
+      {
+        "gene_id": "3005081",
+        "gene_name": "Thermus thermophilus uL3 mutations conferring resistance to pleuromutilin antibiotics",
+        "score": -2.9235329627990723,
+        "is_true_positive": false,
+        "families": [
+          "Ribosomal protein mutation conferring resistance to pleuromutilin antibiotics"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3004173",
+        "gene_name": "Escherichia coli 23S rRNA with mutation conferring resistance to oxazolidinone antibiotics",
+        "score": -2.9941279888153076,
+        "is_true_positive": false,
+        "families": [
+          "23S rRNA with mutation conferring resistance to oxazolidinone antibiotics"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3007645",
+        "gene_name": "Clostridium sporogenes cplR",
+        "score": -3.2291176319122314,
+        "is_true_positive": false,
+        "families": [
+          "Miscellaneous ABC-F subfamily ATP-binding cassette ribosomal protection proteins"
+        ],
+        "mechanisms": [
+          "antibiotic target protection"
+        ]
+      },
+      {
+        "gene_id": "3001313",
+        "gene_name": "facT",
+        "score": -3.255089044570923,
+        "is_true_positive": false,
+        "families": [
+          "major facilitator superfamily (MFS) antibiotic efflux pump"
+        ],
+        "mechanisms": [
+          "antibiotic efflux"
+        ]
+      },
+      {
+        "gene_id": "3004470",
+        "gene_name": "poxtA",
+        "score": -3.303112030029297,
+        "is_true_positive": false,
+        "families": [
+          "Miscellaneous ABC-F subfamily ATP-binding cassette ribosomal protection proteins"
+        ],
+        "mechanisms": [
+          "antibiotic target protection"
+        ]
+      },
+      {
+        "gene_id": "3003441",
+        "gene_name": "cfrA",
+        "score": -3.522852659225464,
+        "is_true_positive": true,
+        "families": [
+          "Cfr 23S ribosomal RNA methyltransferase"
+        ],
+        "mechanisms": [
+          "antibiotic target alteration"
+        ]
+      },
+      {
+        "gene_id": "3003746",
+        "gene_name": "optrA",
+        "score": -3.6264517307281494,
+        "is_true_positive": false,
+        "families": [
+          "Miscellaneous ABC-F subfamily ATP-binding cassette ribosomal protection proteins"
+        ],
+        "mechanisms": [
+          "antibiotic target protection"
+        ]
+      }
+    ],
+    "n_true_positives": 53,
+    "hits_at_k": 5,
+    "precision_at_k": 0.25,
+    "overlap_pct": 100
+  }
+}

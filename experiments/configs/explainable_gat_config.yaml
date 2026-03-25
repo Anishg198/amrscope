@@ -1,0 +1,60 @@
+# Configuration for Explainable Heterogeneous GAT Model
+
+# Model Architecture
+model_type: explainable_gat
+hidden_dim: 256
+out_dim: 128
+num_layers: 3
+num_heads: 8
+dropout: 0.5
+attention_dropout: 0.2
+
+# Training Parameters
+learning_rate: 0.001
+weight_decay: 0.0005
+epochs: 200
+batch_size: 512
+patience: 20
+min_delta: 0.0001
+
+# Multi-Task Loss Weights
+link_prediction_weight: 1.0
+mechanism_classification_weight: 0.3
+regularization_weight: 0.01
+
+# Negative Sampling
+num_neg_samples: 5
+neg_sampling_strategy: uniform
+
+# Data Splits
+train_ratio: 0.8
+val_ratio: 0.1
+test_ratio: 0.1
+random_seed: 42
+
+# Evaluation Metrics
+eval_metrics:
+  - mrr
+  - hits@1
+  - hits@3
+  - hits@10
+  - auc
+
+k_fold: 1  # Set to 5 for cross-validation
+
+# Device Configuration
+device: cuda  # Use 'cpu' if no GPU available
+mixed_precision: true
+
+# Logging and Checkpointing
+log_interval: 10
+save_dir: results/models
+exp_name: explainable_gat_v1
+use_wandb: false
+wandb_project: amr-prediction
+
+# Node and Edge Types (populated automatically from data)
+node_types: []
+edge_types: []
+in_dims: {}
+num_mechanisms: 5

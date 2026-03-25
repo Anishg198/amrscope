@@ -1,0 +1,508 @@
+{
+  "aminocoumarin antibiotic": {
+    "description": "Aminocoumarin antibiotics bind DNA gyrase subunit B to inhibit ATP-dependent DNA supercoiling.",
+    "target": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "aminoglycoside antibiotic": {
+    "description": "Aminoglycosides are a group of antibiotics that are mostly effective against Gram-negative bacteria. These molecules consist of aminated sugars attached to a dibasic cyclitol. Aminoglycosides work by binding to the bacterial 30S ribosomal subunit (some work by binding to the 50S subunit), inhibiting the translocation of the peptidyl-tRNA from the A-site to the P-site and also causing misreading of mRNA, leaving the bacterium unable to synthesize proteins vital to its growth.",
+    "target": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "antibacterial free fatty acids": {
+    "description": "Amongst the diverse and potent biological activities of free fatty acids (FFAs) is the ability to kill or inhibit the growth of bacteria. The antibacterial properties of FFAs are used by many organisms to defend against parasitic or pathogenic bacteria. The prime target of FFA action is the cell membrane, where FFAs disrupt the electron transport chain and oxidative phosphorylation. Besides interfering with cellular energy production, FFA action may also result from the inhibition of enzyme activity, impairment of nutrient uptake, generation of peroxidation and auto-oxidation degradation products or direct lysis of bacterial cells.",
+    "target": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "antibiotic without defined classification": {
+    "description": "These compounds are antibiotics of unique structure or origin, without a defined classification.",
+    "target": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "is_beta_lactam": false
+  },
+  "bicyclomycin-like antibiotic": {
+    "description": "A group of antibiotics including bicyclomycin and its analogues.",
+    "target": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "is_beta_lactam": false
+  },
+  "carbapenem": {
+    "description": "Carbapenems are a class of beta-lactam antibiotics with a broad spectrum of antibacterial activity, and have a structure which renders them highly resistant to beta-lactamases. Carbapenem antibiotics are bactericidal, and act by inhibiting the synthesis of the peptidoglycan layer of bacterial cell walls. The peptidoglycan layer is important for cell wall structural integrity, especially in Gram-positive organisms.",
+    "target": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "is_beta_lactam": true
+  },
+  "cephalosporin": {
+    "description": "Cephalosporins are a class of beta-lactam antibiotics, containing the beta-lactam ring fused with a dihydrothiazolidine ring. Together with cephamycins they belong to a sub-group called cephems. Cephalosporin are bactericidal, and act by inhibiting the synthesis of the peptidoglycan layer of bacterial cell walls. The peptidoglycan layer is important for cell wall structural integrity, especially in Gram-positive organisms.",
+    "target": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "is_beta_lactam": true
+  },
+  "cycloserine-like antibiotic": {
+    "description": "A group of antibiotics including cycloserine and its derivatives.",
+    "target": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "diaminopyrimidine antibiotic": {
+    "description": "Diaminopyrimidines are a class of organic compounds containing a pyrimidine ring substituted by two amine groups.  They are inhibitors of dihydrofolate reductase, an enzyme critical for DNA synthesis.",
+    "target": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "is_beta_lactam": false
+  },
+  "diarylquinoline antibiotic": {
+    "description": "A class of antibiotics used to treat specifically Mycobacterium tuberculosis infection; therefore, referred to as an antimycobacterial. Diarylquinoline antibiotics inhibit ATP synthesis in tuberculosis cells by disruption of mycobacterial ATP synthase.",
+    "target": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "disinfecting agents and antiseptics": {
+    "description": "Disinfectants that can also interact with antimicrobial resistance mechanisms, e.g. molecule efflux, and thus are the targets of disinfectant resistance.",
+    "target": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "elfamycin antibiotic": {
+    "description": "Elfamycins are molecules that inhibit bacterial elongation factor Tu (EF-Tu), a key protein which brings aminoacyl-tRNA (aa-tRNA) to the ribosome during protein synthesis. Elfamycins defined by their target (EF-Tu), rather than a conserved chemical backbone. Elfamycins follow two mechanisms to disrupt protein synthesis: 1. kirromycins and enacyloxin fix EF-Tu in the GTP bound conformation and lock EF-Tu onto the ribosome, and 2. pulvomycin and GE2270 cover the binding site of aa-tRNA disallowing EF-Tu from being charged with aa-tRNA. All elfamycins cause increased the affinity of EF-Tu for GTP.",
+    "target": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "fluoroquinolone antibiotic": {
+    "description": "The fluoroquinolones are a family of synthetic broad-spectrum antibiotics that are 4-quinolone-3-carboxylates. These compounds interact with topoisomerase II (DNA gyrase) to disrupt bacterial DNA replication, damage DNA, and cause cell death.",
+    "target": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "fusidane antibiotic": {
+    "description": "A group of antibiotics possessing steroid rings or steroid-like structures.",
+    "target": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "glycopeptide antibiotic": {
+    "description": "Glycopeptide antibiotics are natural products produced non-ribosomally by Actinomycetales bacteria. With the exception of bleomycins, they act by binding the terminal D-Ala-D-Ala in peptidoglycan precursors of the growing bacterial cell wall and are generally active against Gram-positive bacteria.  This inhibits transglycosylation leading to cell death due to osmotic stress.",
+    "target": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "glycylcycline": {
+    "description": "Glycylcyclines are a new class of antibiotics derived from tetracycline. These tetracycline analogues are specifically designed to overcome two common mechanisms of tetracycline resistance. Presently, there is only one glycylcycline antibiotic for clinical use: tigecycline. It works by inhibiting action of the prokaryotic 30S ribosome, preventing the binding of aminoacyl-tRNA.",
+    "target": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "isoniazid-like antibiotic": {
+    "description": "A group of antibiotics containing isoniazid and its derivatives.",
+    "target": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "is_beta_lactam": false
+  },
+  "lincosamide antibiotic": {
+    "description": "Lincosamides (e.g. lincomycin, clindamycin) are a class of drugs which bind to the 23s portion of the 50S subunit of bacterial ribosomes. This interaction inhibits early elongation of peptide chains by inhibiting the transpeptidase reaction, acting similarly to macrolides.",
+    "target": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "macrolide antibiotic": {
+    "description": "Macrolides are a group of drugs (typically antibiotics) that have a large macrocyclic lactone ring of 12-16 carbons to which one or more deoxy sugars, usually cladinose and desosamine, may be attached. Macrolides bind to the 50S-subunit of bacterial ribosomes, inhibiting the synthesis of vital proteins.",
+    "target": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "moenomycin antibiotic": {
+    "description": "Moemomycin antibiotics are phosphoglycolipids that contain a 3-phosphoglyceric acid, often used as a mixture. They inhibit petidoglycan glycosyltransferases to prevent bacterial cell wall biosynthesis.",
+    "target": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "monobactam": {
+    "description": "Monobactams are a class of beta-lactam antibiotics with a broad spectrum of antibacterial activity, and have a structure which renders them highly resistant to beta-lactamases. Unlike penams and cephems, monobactams do not have any ring fused to its four-member lactam structure. Monobactam antibiotics are bactericidal, and act by inhibiting the synthesis of the peptidoglycan layer of bacterial cell walls. The peptidoglycan layer is important for cell wall structural integrity, especially in Gram-positive organisms.",
+    "target": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "is_beta_lactam": true
+  },
+  "mupirocin-like antibiotic": {
+    "description": "A group of antibiotics including mupirocin and similar mixtures (such as those including pseudomonic acid A).",
+    "target": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "is_beta_lactam": false
+  },
+  "nitrofuran antibiotic": {
+    "description": "Nitrofurans are chemotherapeutic agents with antibacterial and antiprotozoal activity.",
+    "target": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "nitroimidazole antibiotic": {
+    "description": "Nitroimidazoles are a group of drugs that have both antiprotozoal and antibacterial activity, classified with respect to the location of the nitro functional group.",
+    "target": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "nucleoside antibiotic": {
+    "description": "Nucleoside antibiotics are made of modified nucleosides and nucleotides with wide-ranging activities and means of antibacterial effects. This drug class includes aminonucleoside antibiotics, which contain an amino group.",
+    "target": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "orthosomycin antibiotic": {
+    "description": "Orthosomycins are a group of experimental/veterinary orthoester and oligosaccharide antibiotics that target the 70s ribosomal subunit. They are generally no longer considered potential clinical antibiotics, but continue to be used in livestock feed and for experimental purposes.",
+    "target": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "oxazolidinone antibiotic": {
+    "description": "Oxazolidinones are a class of synthetic antibiotics discovered the the 1980's.  They inhibit protein synthesis by binding to domain V of the 23S rRNA of the 50S subunit of bacterial ribosomes.  Linezolid is the only member of this class currently in clinical use.",
+    "target": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "pactamycin-like antibiotic": {
+    "description": "A group of antibiotics including pactamycin and its derivatives.",
+    "target": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "penicillin beta-lactam": {
+    "description": "Penicilins (Penams) are a group of antibiotics derived from Penicillium fungi that share a skeleton beta-lactam moiety fused with a thiazolidine ring. Penicillin-like antibiotics are historically significant because they are the first drugs that were effective against many previously serious diseases such as syphilis and Staphylococcus infections. Penicillins are still widely used today, though many types of bacteria are now resistant. All penicillins are beta-lactam antibiotics in the penam sub-group, and are used in the treatment of bacterial infections caused by susceptible, usually Gram-positive, organisms.",
+    "target": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "is_beta_lactam": true
+  },
+  "peptide antibiotic": {
+    "description": "Peptide antibiotics have a wide range of antibacterial mechanisms, depending on the amino acids that make up the antibiotic, although most act to disrupt the cell membrane in some manner. Subclasses of peptide antibiotics can include additional sidechains of other types, such as lipids in the case of the lipopeptide antibiotics.",
+    "target": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "phenicol antibiotic": {
+    "description": "Phenicols are broad spectrum bacteriostatic antibiotics acting on bacterial protein synthesis. More specifically, the phenicols block peptide elongation by binding to the peptidyltansferase centre of the 70S ribosome.",
+    "target": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "phosphonic acid antibiotic": {
+    "description": "A group of antibiotics derived from phosphonic acids.",
+    "target": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "pleuromutilin antibiotic": {
+    "description": "Pleuromutilins are natural fungal products that target bacterial protein translation by binding the the 23S rRNA, blocking the ribosome P site at the 50S subunit. They are mostly used for agriculture and veterinary purposes.",
+    "target": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "polyamine antibiotic": {
+    "description": "Polyamine antibiotics are organic compounds having two or more primary amino groups.",
+    "target": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "pyrazine antibiotic": {
+    "description": "A group of antibiotics derived from pyrazine.",
+    "target": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "is_beta_lactam": false
+  },
+  "rifamycin antibiotic": {
+    "description": "Rifamycin antibiotics are a group of broad-spectrum ansamycin antibiotics that inhibit bacterial RNA polymerase by binding to a highly conserved region, blocking the oligonucleotide exit tunnel, and preventing the extension of nascent mRNAs.",
+    "target": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "salicylic acid antibiotic": {
+    "description": "A group of antibiotics derived from salicylic acid.",
+    "target": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "is_beta_lactam": false
+  },
+  "streptogramin A antibiotic": {
+    "description": "Streptogramin A antibiotics are cyclic polyketide peptide hybrids that bind to the ribosomal peptidyl transfer centre. Structural variation arises from substituting a proline for its desaturated derivative and by its substitution for Ala or Cys. Used alone, streptogramin A antibiotics are bacteriostatic, but is bactericidal when used with streptogramin B antibiotics.",
+    "target": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "streptogramin B antibiotic": {
+    "description": "Streptogramin B antibiotics are are cyclic hepta- or hexa-depsipeptides.  Type B streptogramins block the peptide exit tunnel of the 50S bacterial ribosome. The general composition of group B streptogramins is 3-hydroxypicolinic acid-L-Thr-D-aminobutyric acid (or D-Ala)-L-Pro-L-Phe (or 4-N-,N-(dimethylamino)-L-Phe)-X-L-phenylglycine. Used alone, streptogramin B antibiotics are bacteriostatic, but is bactericidal when used with streptogramin A antibiotics.",
+    "target": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "streptogramin antibiotic": {
+    "description": "Streptogramin antibiotics are natural products produced by various members of the Streptomyces genus. These antibiotics bind to the P site of the 50S subunit of bacterial ribosomes to inhibit protein synthesis. The family consists of two subgroups, type A and type B, which are simultaneously produced by the same bacterial species in a ratio of roughly 70:30.",
+    "target": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "sulfonamide antibiotic": {
+    "description": "Sulfonamides are broad spectrum, synthetic antibiotics that contain the sulfonamide group. Sulfonamides inhibit dihydropteroate synthase, which catalyzes the conversion of p-aminobenzoic acid to dihydropteroic acid as part of the tetrahydrofolic acid biosynthetic pathway. Tetrahydrofolic acid is essential for folate synthesis, a precursor of many nucleotides and amino acids. Many sulfamides are taken with trimethoprim, an inhibitor of dihydrofolate reductase, also disturbing the trihydrofolic acid synthesis pathway.",
+    "target": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "is_beta_lactam": false
+  },
+  "sulfone antibiotic": {
+    "description": "A sulfone active against a wide range of bacteria but mainly employed for its actions against mycobacterium laprae. Its mechanism of action  involves inhibition of folic acid synthesis in susceptible organisms.",
+    "target": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "tetracycline antibiotic": {
+    "description": "These antibiotics are derived from tetracycline, a polyketide antibiotic that inhibits the 30S subunit of bacterial ribosomes.",
+    "target": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  },
+  "thioamide antibiotic": {
+    "description": "A group of antibiotics possessing the thioamide functional group.",
+    "target": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "is_beta_lactam": false
+  },
+  "thiosemicarbazone antibiotic": {
+    "description": "A group of antibiotics derived from thiosemicarbazide (possessing the thiosemicarbazone functional group).",
+    "target": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "is_beta_lactam": false
+  },
+  "zoliflodacin-like antibiotic": {
+    "description": "A group of antibiotics including the experimental compound zoliflodacin and its derivatives.",
+    "target": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "is_beta_lactam": false
+  }
+}

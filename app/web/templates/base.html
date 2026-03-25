@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}BioMolAMR{% endblock %}</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="/static/style.css"/>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top" id="main-nav">
+  <div class="container-xl">
+    <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="/">
+      <span class="brand-icon">🦠</span>
+      <span>BioMol<span class="text-accent">AMR</span></span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto gap-1">
+        <li class="nav-item"><a class="nav-link {% if request.url.path=='/' %}active{% endif %}" href="/">Home</a></li>
+        <li class="nav-item"><a class="nav-link {% if '/results' in request.url.path %}active{% endif %}" href="/results">Results</a></li>
+        <li class="nav-item"><a class="nav-link {% if '/predict' in request.url.path %}active{% endif %}" href="/predict">
+          <i class="bi bi-cpu"></i> Predict
+        </a></li>
+        <li class="nav-item"><a class="nav-link {% if '/about' in request.url.path %}active{% endif %}" href="/about">About</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main>
+{% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer mt-5 py-4">
+  <div class="container-xl text-center">
+    <p class="mb-1 text-muted small">
+      BioMolAMR · Zero-Shot Antimicrobial Resistance Prediction ·
+      CARD 3.2.6 · ESM-2 · Molecular Fingerprints
+    </p>
+    <p class="mb-0 text-muted small">Target venue: IEEE BIBM 2025</p>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="/static/app.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

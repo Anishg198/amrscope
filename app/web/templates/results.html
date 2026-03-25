@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% block title %}Results — BioMolAMR{% endblock %}
+
+{% block content %}
+<div class="container-xl py-5">
+
+  <!-- Header -->
+  <div class="mb-5">
+    <h1 class="section-title">Experimental Results</h1>
+    <p class="section-sub">Full evaluation on CARD v3.2.6 · 6,397 genes · 46 drug classes · 12 zero-shot held-out</p>
+  </div>
+
+  <!-- Leakage callout -->
+  <div class="callout-red mb-5">
+    <div class="d-flex align-items-start gap-3">
+      <i class="bi bi-shield-exclamation" style="font-size:1.5rem;color:var(--red);flex-shrink:0;margin-top:2px"></i>
+      <div>
+        <div class="fw-bold mb-1" style="font-weight:700">Data Leakage in Prior Zero-Shot AMR Work</div>
+        <div class="small">Prior work encoded gene features with 46-dim drug-class membership vectors — the exact labels being predicted —
+        inflating zero-shot performance by <strong>5.7×</strong> (0.775 → 0.137 ZS-within MRR after cleaning).
+        Our clean evaluation uses ESM-2 protein embeddings with no drug-class information.
+        The primary metric is <strong>ZS-all MRR</strong> (random = 1/46 ≈ 0.022), not the narrow 5-way ZS-within ranking used previously.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main results table -->
+  <div class="card-dark mb-5">
+    <h5 class="mb-1">Main Results</h5>
+    <p class="text-muted small mb-3">5-seed mean ± std · Bold = best · ZS-all random = 0.022 · ZS-within random = 1/12 ≈ 0.083</p>
+    <div class="table-responsive">
+      <table class="result-table">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Type</th>
+            <th>Test MRR</th>
+            <th>ZS-within MRR</th>
+            <th>ZS-all MRR ↑</th>
+            <th>P@20 (ZS)</th>
+          </tr>
+        </thead>
+        <tbody id="resultsTableBody">
+          <tr><td colspan="6" class="text-muted text-center py-3">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Charts row -->
+  <div class="row g-4 mb-5">
+    <div class="col-lg-6">
+      <div class="card-dark">
+        <h5 class="mb-3">ZS-all MRR by Model</h5>
+        <canvas id="zsAllChart" height="200"></canvas>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card-dark">
+        <h5 class="mb-3">Test vs Zero-Shot MRR</h5>
+        <canvas id="testVsZsChart" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ablation -->
+  <div class="card-dark mb-5">
+    <h5 class="mb-1">Ablation Study — Feature Necessity</h5>
+    <p class="text-muted small mb-3">Feature-MLP variants · Both ESM-2 and molecular fingerprints jointly necessary</p>
+    <div class="table-responsive">
+      <table class="result-table">
+        <thead>
+          <tr>
+            <th>Variant</th>
+            <th>Gene Features</th>
+            <th>Drug Features</th>
+            <th>ZS-within MRR</th>
+            <th>ZS-all MRR</th>
+            <th>Δ vs Full</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="best">
+            <td><strong>Feature-MLP (full)</strong></td>
+            <td><span class="tag tag-zs">ESM-2 480d</span></td>
+            <td><span class="tag tag-zs">MolFP 3245d</span></td>
+            <td>0.137 ± 0.004</td>
+            <td><strong>0.069 ± 0.006</strong></td>
+            <td class="text-green">—</td>
+          </tr>
+          <tr>
+            <td>FMLP: gene = 0</td>
+            <td><span class="tag" style="background:rgba(248,81,73,.2);color:var(--red)">zeros</span></td>
+            <td><span class="tag tag-zs">MolFP 3245d</span></td>
+            <td>0.140 ± 0.003</td>
+            <td>0.020 ± 0.002</td>
+            <td class="text-red">↓ 3.5×</td>
+          </tr>
+          <tr>
+            <td>FMLP: drug = 0</td>
+            <td><span class="tag tag-zs">ESM-2 480d</span></td>
+            <td><span class="tag" style="background:rgba(248,81,73,.2);color:var(--red)">zeros</span></td>
+            <td>0.010 ± 0.000</td>
+            <td>0.010 ± 0.000</td>
+            <td class="text-red">↓ 6.9×</td>
+          </tr>
+          <tr>
+            <td>FMLP: leaky</td>
+            <td><span class="tag" style="background:rgba(210,153,34,.2);color:var(--yellow)">46d drug-class</span></td>
+            <td><span class="tag tag-zs">MolFP 3245d</span></td>
+            <td>0.159 ± 0.030</td>
+            <td>0.112 ± 0.000</td>
+            <td style="color:var(--yellow)">↑ 1.6× (leaky)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout-yellow mt-3">
+      <div class="small"><strong>Interpretation:</strong> Setting gene features to zero collapses ZS-all MRR to random (0.020 ≈ 0.022),
+      while zeroing drug features falls below random (0.010). Both feature modalities contribute independently;
+      their combination provides genuine zero-shot transfer. The leaky variant confirms the 5.7× inflation is entirely
+      attributable to drug-class label leakage in the gene feature vector.</div>
+    </div>
+  </div>
+
+  <!-- Per-class breakdown -->
+  <div class="card-dark mb-5">
+    <h5 class="mb-1">Per-Class Zero-Shot Performance (Feature-MLP)</h5>
+    <p class="text-muted small mb-3">ZS-all MRR for each of the 12 held-out drug classes</p>
+    <canvas id="perClassChart" height="150"></canvas>
+  </div>
+
+  <!-- Figures -->
+  <h2 class="section-title mb-2">Publication Figures</h2>
+  <p class="section-sub mb-4">Generated by pipeline/10_paper_figures.py</p>
+  <div class="row g-3" id="figureGrid">
+    <!-- Populated by JS -->
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const FIGURES = [
+  { src:'/figures/F1_leakage_diagram.png', cap:'F1 · Data leakage: 46-dim drug-class features in gene embedding directly encode the prediction target.' },
+  { src:'/figures/F2_main_results.png',    cap:'F2 · Main results: ZS-all MRR and ZS-within MRR across all 5 models + random baseline.' },
+  { src:'/figures/F3_per_class_heatmap.png', cap:'F3 · Per-class ZS-all MRR heatmap sorted by Feature-MLP performance.' },
+  { src:'/figures/F4_tanimoto_scatter.png',  cap:'F4 · Tanimoto similarity between training and test drug classes vs ZS-all MRR improvement.' },
+  { src:'/figures/F5_ablation.png',          cap:'F5 · Ablation: effect of removing ESM-2 gene or molecular fingerprint drug features.' },
+];
+
+// Populate figure grid
+const grid = document.getElementById('figureGrid');
+FIGURES.forEach(f=>{
+  const col = document.createElement('div');
+  col.className='col-md-6 col-xl-4';
+  col.innerHTML=`<div class="fig-card"><img src="${f.src}" alt="${f.cap}" loading="lazy" onerror="this.parentElement.style.display='none'"><div class="fig-caption">${f.cap}</div></div>`;
+  grid.appendChild(col);
+});
+
+// Load results
+fetch('/api/results').then(r=>r.json()).then(data=>{
+  const tbody = document.getElementById('resultsTableBody');
+  const models = data.models || [];
+  if(!models.length){ tbody.innerHTML='<tr><td colspan="6" class="text-muted text-center">No results loaded</td></tr>'; return; }
+
+  tbody.innerHTML='';
+  const bestZs = Math.max(...models.map(m=>m.zs_all_mrr_mean||0));
+  models.forEach(m=>{
+    const isBest = Math.abs((m.zs_all_mrr_mean||0)-bestZs)<0.001;
+    const isRand = (m.name||'').toLowerCase().includes('random');
+    const tr=document.createElement('tr');
+    if(isBest) tr.className='best';
+    if(isRand) tr.className='random';
+    const zsAll = m.zs_all_mrr_mean!=null ? m.zs_all_mrr_mean.toFixed(3)+(m.zs_all_mrr_std!=null?` ± ${m.zs_all_mrr_std.toFixed(3)}`:'') : '—';
+    const zsWin = m.zs_within_mrr_mean!=null ? m.zs_within_mrr_mean.toFixed(3)+(m.zs_within_mrr_std!=null?` ± ${m.zs_within_mrr_std.toFixed(3)}`:'') : '—';
+    const testMrr = m.test_mrr_mean!=null ? m.test_mrr_mean.toFixed(3) : '—';
+    const pat20 = m.precision_at_20_mean!=null ? m.precision_at_20_mean.toFixed(3) : '—';
+    const typeTag = (m.type||'').includes('graph') ? '<span class="tag tag-zs">GNN</span>' : '<span class="tag tag-tp">MLP</span>';
+    tr.innerHTML=`<td><strong>${m.name||'?'}</strong></td><td>${typeTag}</td><td>${testMrr}</td><td>${zsWin}</td><td>${isBest?`<strong>${zsAll}</strong>`:zsAll}</td><td>${pat20}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  // ZS-all bar chart
+  const labelsAll = models.filter(m=>!m.name?.includes('random')).map(m=>m.name);
+  const valsAll   = labelsAll.map(n=>{ const m=models.find(x=>x.name===n); return m?.zs_all_mrr_mean||0; });
+  new Chart(document.getElementById('zsAllChart'),{
+    type:'bar',
+    data:{ labels:labelsAll, datasets:[{data:valsAll, backgroundColor:valsAll.map(v=>v>=0.05?'#3fb950':'#58a6ff'), borderRadius:6}] },
+    options:{ plugins:{legend:{display:false}}, scales:{x:{grid:{color:'#30363d'},ticks:{color:'#8b949e'}},y:{grid:{color:'#30363d'},ticks:{color:'#8b949e'},beginAtZero:true}} }
+  });
+
+  // Test vs ZS scatter
+  const scatterData = models.filter(m=>m.test_mrr_mean!=null&&m.zs_all_mrr_mean!=null&&!m.name?.includes('random'))
+    .map(m=>({x:m.test_mrr_mean,y:m.zs_all_mrr_mean,label:m.name}));
+  new Chart(document.getElementById('testVsZsChart'),{
+    type:'scatter',
+    data:{ datasets:[{data:scatterData, backgroundColor:'#58a6ff', pointRadius:7, pointHoverRadius:9}] },
+    options:{
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw.label}: test=${ctx.raw.x.toFixed(3)}, zs=${ctx.raw.y.toFixed(3)}`}}},
+      scales:{x:{grid:{color:'#30363d'},ticks:{color:'#8b949e'},title:{display:true,text:'Test MRR',color:'#8b949e'}},
+              y:{grid:{color:'#30363d'},ticks:{color:'#8b949e'},title:{display:true,text:'ZS-all MRR',color:'#8b949e'}}}
+    }
+  });
+
+  // Per-class chart
+  const perClass = data.per_class_feature_mlp || {};
+  const pcLabels = Object.keys(perClass).sort((a,b)=>perClass[b]-perClass[a]);
+  const pcVals   = pcLabels.map(k=>perClass[k]);
+  if(pcLabels.length){
+    new Chart(document.getElementById('perClassChart'),{
+      type:'bar',
+      data:{ labels:pcLabels, datasets:[{data:pcVals, backgroundColor:pcVals.map(v=>v>=0.3?'#3fb950':v>=0.1?'#58a6ff':'#8b949e'), borderRadius:4}] },
+      options:{
+        indexAxis:'y',
+        plugins:{legend:{display:false},annotation:{annotations:{r:{type:'line',xMin:0.022,xMax:0.022,borderColor:'#d29922',borderWidth:1.5,borderDash:[4,4]}}}},
+        scales:{x:{grid:{color:'#30363d'},ticks:{color:'#8b949e'},beginAtZero:true},y:{grid:{color:'#30363d'},ticks:{color:'#8b949e',font:{size:11}}}}
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

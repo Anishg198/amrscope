@@ -1,0 +1,17 @@
+\begin{table}[t]
+\centering
+\caption{Zero-shot link prediction (within held-out drug classes, n$_{\rm zs}$=5)}
+\label{tab:zeroshot}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Model} & \textbf{MRR} & \textbf{Hits@1} & \textbf{Hits@3} & \textbf{Hits@10} & \textbf{AUC} \\
+\midrule
+zs\_hetgat & 0.5434$\pm$0.0535 & 0.5236$\pm$0.0571 & 0.5236$\pm$0.0571 & 0.5414$\pm$0.0577 & 0.7213 \\
+rgcn & 0.7750$\pm$0.0128 & 0.7632$\pm$0.0124 & 0.7632$\pm$0.0124 & 0.7764$\pm$0.0171 & 0.7696 \\
+feature\_mlp & 0.4758$\pm$0.0519 & 0.4546$\pm$0.0520 & 0.4546$\pm$0.0520 & 0.4655$\pm$0.0548 & 0.1942 \\
+distmult & 0.4281$\pm$0.0385 & 0.4023$\pm$0.0385 & 0.4023$\pm$0.0385 & 0.4236$\pm$0.0425 & 0.5152 \\
+transe & 0.3252$\pm$0.0636 & 0.2960$\pm$0.0646 & 0.2960$\pm$0.0646 & 0.3224$\pm$0.0727 & 0.3071 \\
+Random & 0.4772 & -- & -- & -- & 0.5000 \\ \\
+\bottomrule
+\end{tabular}
+\end{table}

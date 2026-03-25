@@ -1,0 +1,622 @@
+{% extends "base.html" %}
+{% block title %}Predict — BioMolAMR{% endblock %}
+
+{% block content %}
+<div class="container-xl py-5">
+
+  <div class="mb-4">
+    <h1 class="section-title">Interactive Prediction</h1>
+    <p class="section-sub">Query trained models in real time</p>
+  </div>
+
+  <!-- Tag legend -->
+  <div class="card-dark mb-4" style="padding:14px 20px">
+    <div class="d-flex flex-wrap gap-3 align-items-center">
+      <span class="text-muted small fw-bold me-1">TAG LEGEND:</span>
+      <span><span class="tag tag-tp">TP</span> <span class="small text-muted">True Positive — gene-drug pair confirmed in CARD database</span></span>
+      <span><span class="tag tag-zs">ZS</span> <span class="small text-muted">Zero-Shot — drug class <em>withheld</em> during training; model has never seen it</span></span>
+      <span><span class="tag tag-zs-tp">ZS+TP</span> <span class="small text-muted">Both — confirmed resistance to a withheld drug class</span></span>
+      <span><span class="tag" style="background:rgba(210,153,34,.2);color:var(--yellow)">★ ZS</span> <span class="small text-muted">Drug search: zero-shot class (harder to predict)</span></span>
+    </div>
+  </div>
+
+  <!-- Model selector -->
+  <div class="card-dark mb-4">
+    <div class="row align-items-center g-3">
+      <div class="col-md-4">
+        <label class="form-label">Model</label>
+        <select class="form-select" id="globalModel">
+          {% for m in models %}
+          <option value="{{ m }}">{{ m.replace('_',' ').title() }}</option>
+          {% endfor %}
+          {% if not models %}
+          <option value="feature_mlp">Feature MLP</option>
+          {% endif %}
+        </select>
+      </div>
+      <div class="col-md-8">
+        <div class="d-flex flex-wrap gap-2 align-items-center mt-3 mt-md-4">
+          <span class="badge-zs">ZS-all MRR best: 0.069</span>
+          <span class="text-muted small">· 46 drug classes · 6,397 genes · 12 ZS held-out</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <ul class="nav predict-tabs mb-0" id="predictTabs">
+    <li class="nav-item"><a class="nav-link active" href="#" data-tab="gene2drug">
+      <i class="bi bi-arrow-right-circle me-1"></i>Gene → Drug
+    </a></li>
+    <li class="nav-item"><a class="nav-link" href="#" data-tab="drug2gene">
+      <i class="bi bi-arrow-left-circle me-1"></i>Drug → Gene
+    </a></li>
+    <li class="nav-item"><a class="nav-link" href="#" data-tab="smiles" id="smilesTab">
+      <i class="bi bi-flask me-1"></i>Novel SMILES
+    </a></li>
+    <li class="nav-item"><a class="nav-link" href="#" data-tab="compare">
+      <i class="bi bi-columns me-1"></i>Compare Models
+    </a></li>
+  </ul>
+
+  <!-- ── Gene → Drug ────────────────────────────────────────────────────── -->
+  <div class="predict-panel" id="panel-gene2drug">
+    <div class="row g-3 mb-4">
+      <div class="col-md-7">
+        <label class="form-label">Search Resistance Gene</label>
+        <div style="position:relative">
+          <input type="text" class="form-control" id="geneSearch" placeholder="e.g. TEM-1, blaTEM, ARO:3000014…">
+          <div class="search-results-dropdown" id="geneDropdown" style="display:none"></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">&nbsp;</label>
+        <div>
+          <button class="btn btn-primary w-100" id="btnGeneDrug" disabled>
+            <i class="bi bi-cpu me-1"></i>Predict
+          </button>
+        </div>
+      </div>
+    </div>
+    <div id="selectedGeneInfo" style="display:none" class="callout-blue mb-4">
+      <strong id="selectedGeneName">—</strong>
+      <div class="small text-muted mt-1" id="selectedGeneDesc"></div>
+      <div class="small mt-1"><span class="tag tag-zs" id="selectedGeneARO"></span></div>
+    </div>
+    <div class="predict-spinner" id="spinnerGeneDrug">
+      <div class="spinner-border" role="status"></div>
+      <div class="mt-2">Running inference…</div>
+    </div>
+    <div id="geneDrugResults" style="display:none">
+      <!-- Verdict -->
+      <div id="geneDrugVerdict" class="mb-4"></div>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="mb-0">Ranked Drug Classes</h6>
+        <div class="text-muted small" id="geneDrugMeta"></div>
+      </div>
+      <div class="table-responsive">
+        <table class="result-table">
+          <thead>
+            <tr><th>#</th><th>Drug Class</th><th>Score</th><th>Bar</th><th>Tags</th></tr>
+          </thead>
+          <tbody id="geneDrugBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Drug → Gene ────────────────────────────────────────────────────── -->
+  <div class="predict-panel" id="panel-drug2gene" style="display:none">
+    <div class="callout-blue mb-4">
+      <div class="small"><strong>Drug → Resistance Genes:</strong> Type any antibiotic drug class name
+      (e.g. "beta-lactam", "aminoglycoside", "tetracycline") and discover which resistance genes are most
+      likely to confer resistance — ranked by model score.</div>
+    </div>
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <label class="form-label">Search Drug Class</label>
+        <div style="position:relative">
+          <input type="text" class="form-control" id="drugSearch"
+                 placeholder="e.g. beta-lactam, aminoglycoside, tetracycline…">
+          <div class="search-results-dropdown" id="drugDropdown" style="display:none"></div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Top K</label>
+        <input type="number" class="form-control" id="drugTopK" value="30" min="5" max="200">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">&nbsp;</label>
+        <div>
+          <button class="btn btn-primary w-100" id="btnDrugGene" disabled>
+            <i class="bi bi-cpu me-1"></i>Predict
+          </button>
+        </div>
+      </div>
+    </div>
+    <div id="selectedDrugInfo" style="display:none" class="callout-blue mb-4">
+      <div class="d-flex align-items-center gap-3">
+        <div>
+          <strong id="selectedDrugName">—</strong>
+          <span id="selectedDrugZsBadge" style="display:none" class="tag tag-zs ms-2">Zero-Shot Class</span>
+        </div>
+        <div class="text-muted small ms-auto" id="selectedDrugIdx"></div>
+      </div>
+    </div>
+    <div class="predict-spinner" id="spinnerDrugGene">
+      <div class="spinner-border" role="status"></div>
+      <div class="mt-2">Running inference…</div>
+    </div>
+    <div id="drugGeneResults" style="display:none">
+      <!-- Verdict -->
+      <div id="drugGeneVerdict" class="mb-4"></div>
+      <div class="precision-badge" id="drugGenePrec">
+        <div>
+          <div class="num" id="precNum">—</div>
+          <div class="lbl" id="precLbl">Precision@K</div>
+        </div>
+        <div class="text-muted small" id="precDetail"></div>
+      </div>
+      <div class="table-responsive">
+        <table class="result-table">
+          <thead>
+            <tr><th>#</th><th>Gene</th><th>ARO</th><th>Score</th><th>TP?</th></tr>
+          </thead>
+          <tbody id="drugGeneBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Novel SMILES ───────────────────────────────────────────────────── -->
+  <div class="predict-panel" id="panel-smiles" style="display:none">
+    <div class="callout-blue mb-4">
+      <div class="small"><strong>Novel Drug Mode:</strong> Paste any SMILES string — including drugs not in CARD.
+      The system computes Morgan + MACCS + TopoTorsion fingerprints and predicts top resistance genes using Feature-MLP.
+      Tanimoto similarity to the nearest training drug is reported as a reliability indicator.</div>
+    </div>
+    <div class="row g-3 mb-4">
+      <div class="col-md-8">
+        <label class="form-label">SMILES String</label>
+        <input type="text" class="form-control" id="smilesInput"
+               placeholder="e.g. CC1=C2[C@@](CC[C@@]2(C)CCC1)(C)O  (artemisinin-like)">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Top K</label>
+        <input type="number" class="form-control" id="smilesTopK" value="30" min="5" max="200">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">&nbsp;</label>
+        <div>
+          <button class="btn btn-primary w-100" id="btnSmiles">
+            <i class="bi bi-cpu me-1"></i>Run
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- Example SMILES buttons -->
+    <div class="mb-4">
+      <div class="text-muted small mb-2">Example drugs:</div>
+      <div class="d-flex flex-wrap gap-2">
+        <button class="btn btn-outline-secondary btn-sm example-smiles" data-smiles="CC1(C)S[C@@H]2[C@H](NC(=O)[C@@H](N)c3ccccc3)C(=O)N2[C@H]1C(=O)O">Ampicillin</button>
+        <button class="btn btn-outline-secondary btn-sm example-smiles" data-smiles="O=C1/C(=C\c2ccc(O)cc2)CO1">Novobiocin-like</button>
+        <button class="btn btn-outline-secondary btn-sm example-smiles" data-smiles="OC[C@H]1O[C@@H](n2cnc3c(N)ncnc32)[C@H](O)[C@@H]1O">Adenosine</button>
+        <button class="btn btn-outline-secondary btn-sm example-smiles" data-smiles="CC1=CC2=C(C=C1C)N(C[C@@H](O)COP(=O)(O)OP(=O)(O)OC[C@H]3O[C@@H]([n+]4ccc(C(N)=O)cc4)[C@H](O)[C@@H]3O)C=NC2=O">FAD</button>
+      </div>
+    </div>
+    <div class="predict-spinner" id="spinnerSmiles">
+      <div class="spinner-border" role="status"></div>
+      <div class="mt-2">Computing fingerprints & running inference…</div>
+    </div>
+    <div id="smilesResults" style="display:none">
+      <!-- Verdict -->
+      <div id="smilesVerdict" class="mb-4"></div>
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <div class="card-dark">
+            <div class="text-muted small mb-1">Nearest Training Drug</div>
+            <div class="fw-bold" id="nearestDrug">—</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card-dark">
+            <div class="text-muted small mb-1">Tanimoto Similarity</div>
+            <div class="fw-bold" id="tanScore">—</div>
+            <div class="tan-meter mt-2"><div class="tan-fill" id="tanFill" style="width:0%;background:var(--accent)"></div></div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card-dark">
+            <div class="text-muted small mb-1">Fingerprint Bits</div>
+            <div class="fw-bold" id="fpDim">3245</div>
+          </div>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="result-table">
+          <thead>
+            <tr><th>#</th><th>Gene</th><th>ARO</th><th>Score</th><th>Description</th></tr>
+          </thead>
+          <tbody id="smilesBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Compare Models ─────────────────────────────────────────────────── -->
+  <div class="predict-panel" id="panel-compare" style="display:none">
+    <div class="row g-3 mb-4">
+      <div class="col-md-7">
+        <label class="form-label">Search Resistance Gene</label>
+        <div style="position:relative">
+          <input type="text" class="form-control" id="compareGeneSearch" placeholder="e.g. TEM-1 β-lactamase…">
+          <div class="search-results-dropdown" id="compareGeneDropdown" style="display:none"></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">&nbsp;</label>
+        <div>
+          <button class="btn btn-primary w-100" id="btnCompare" disabled>
+            <i class="bi bi-columns me-1"></i>Compare
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="predict-spinner" id="spinnerCompare">
+      <div class="spinner-border" role="status"></div>
+      <div class="mt-2">Running all models…</div>
+    </div>
+    <div id="compareResults" style="display:none">
+      <div class="row g-3" id="compareColumns"></div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ── Verdict generator ──────────────────────────────────────────────────────
+function geneDrugVerdict(rows, geneName) {
+  const top3     = rows.slice(0, 3);
+  const tpRows   = rows.filter(r => r.is_tp);
+  const tpTop5   = rows.slice(0, 5).filter(r => r.is_tp);
+  const zsTop5   = rows.slice(0, 5).filter(r => r.is_zs);
+  const topScore = rows[0]?.score || 0;
+  const secondScore = rows[1]?.score || 0;
+  const margin   = secondScore > 0 ? topScore / secondScore : 999;
+
+  // Confidence
+  let conf, confColor, confIcon;
+  if (topScore > 2.0 && margin > 2)         { conf='High confidence';   confColor='var(--green)';  confIcon='bi-check-circle-fill'; }
+  else if (topScore > 0.5 || margin > 1.5)  { conf='Moderate confidence'; confColor='var(--accent)'; confIcon='bi-info-circle-fill'; }
+  else                                        { conf='Low confidence';    confColor='var(--yellow)'; confIcon='bi-exclamation-circle-fill'; }
+
+  const top1Name  = rows[0]?.name  || '—';
+  const top1Score = rows[0]?.score?.toFixed(3) || '—';
+  const tpInTop5Txt = tpTop5.length
+    ? `The model correctly identifies <strong>${tpTop5.map(r=>`<em>${r.name}</em>`).join(', ')}</strong> (confirmed in CARD) within the top 5.`
+    : `No CARD-confirmed associations appear in the top 5.`;
+  const zsNote = zsTop5.length
+    ? `<strong>${zsTop5.map(r=>`<em>${r.name}</em>`).join(', ')}</strong> — marked ZS — were never seen during training, making these predictions genuine zero-shot transfers.`
+    : '';
+
+  const overallTp = tpRows.length;
+  const recall5   = tpTop5.length;
+
+  return `<div class="card-dark" style="border-left:4px solid ${confColor}">
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <i class="bi ${confIcon}" style="color:${confColor};font-size:1.1rem"></i>
+      <span style="font-weight:700;color:${confColor}">${conf}</span>
+      <span class="text-muted small ms-auto">Top predicted: <strong>${top1Name}</strong> (score ${top1Score})</span>
+    </div>
+    <p class="small mb-2">
+      The model predicts that <strong>${geneName}</strong> most strongly confers resistance to
+      <strong>${top3.map(r=>`${r.name}`).join(', ')}</strong>.
+      ${tpInTop5Txt}
+    </p>
+    ${zsNote ? `<p class="small mb-2">${zsNote}</p>` : ''}
+    <div class="d-flex flex-wrap gap-3 mt-2" style="font-size:.8rem;color:var(--muted)">
+      <span><i class="bi bi-database me-1"></i>${overallTp} CARD-confirmed associations exist for this gene across all 46 classes</span>
+      <span><i class="bi bi-bullseye me-1"></i>${recall5} of ${Math.min(5, overallTp || 5)} known TPs recovered in top 5</span>
+      <span><i class="bi bi-lightning me-1"></i>Score gap: top vs #2 = ${margin.toFixed(1)}×</span>
+    </div>
+  </div>`;
+}
+
+function drugGeneVerdict(data, drugName, topK) {
+  const prec    = data.precision_at_k || 0;
+  const nTp     = data.n_true_positives || 0;
+  const results = data.results || [];
+  const found   = results.filter(r => r.is_tp).length;
+  const top3    = results.slice(0, 3);
+
+  let conf, confColor, confIcon;
+  if (prec >= 0.3)       { conf='High confidence';   confColor='var(--green)';  confIcon='bi-check-circle-fill'; }
+  else if (prec >= 0.1)  { conf='Moderate confidence'; confColor='var(--accent)'; confIcon='bi-info-circle-fill'; }
+  else if (nTp === 0)    { conf='No known associations'; confColor='var(--muted)'; confIcon='bi-question-circle-fill'; }
+  else                    { conf='Low confidence';    confColor='var(--yellow)'; confIcon='bi-exclamation-circle-fill'; }
+
+  const top3txt = top3.map(r => `<em>${r.name}</em>`).join(', ');
+  const tpNote  = nTp > 0
+    ? `CARD lists <strong>${nTp}</strong> genes confirmed to resist <strong>${drugName}</strong>; the model recovers <strong>${found}</strong> of them in the top ${topK} (Precision@${topK} = ${prec.toFixed(3)}).`
+    : `No confirmed associations for <strong>${drugName}</strong> exist in CARD — this may be a zero-shot drug class or poorly characterised. Predictions are exploratory.`;
+
+  return `<div class="card-dark" style="border-left:4px solid ${confColor}">
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <i class="bi ${confIcon}" style="color:${confColor};font-size:1.1rem"></i>
+      <span style="font-weight:700;color:${confColor}">${conf}</span>
+      <span class="text-muted small ms-auto">Precision@${topK} = <strong>${prec.toFixed(3)}</strong></span>
+    </div>
+    <p class="small mb-2">
+      Top predicted resistance genes for <strong>${drugName}</strong>: ${top3txt}.
+      ${tpNote}
+    </p>
+    <div class="d-flex flex-wrap gap-3 mt-2" style="font-size:.8rem;color:var(--muted)">
+      <span><i class="bi bi-database me-1"></i>${nTp} CARD-confirmed genes for this drug class</span>
+      <span><i class="bi bi-bullseye me-1"></i>${found} recovered in top-${topK}</span>
+      <span><i class="bi bi-info-circle me-1"></i>Genes with <span class="tag tag-tp" style="font-size:.65rem">TP</span> tag are CARD-validated</span>
+    </div>
+  </div>`;
+}
+
+function smilesVerdict(data, topK) {
+  const tan     = data.tanimoto || 0;
+  const nearest = data.nearest_drug || '—';
+  const results = data.results || [];
+  const top3    = results.slice(0, 3);
+
+  let rel, relColor, relIcon;
+  if (tan >= 0.5)      { rel='High structural similarity to training drugs — reliable prediction'; relColor='var(--green)';  relIcon='bi-check-circle-fill'; }
+  else if (tan >= 0.25){ rel='Moderate similarity — prediction likely but uncertain';              relColor='var(--accent)'; relIcon='bi-info-circle-fill'; }
+  else                  { rel='Low similarity — structurally novel drug, treat as exploratory';    relColor='var(--yellow)'; relIcon='bi-exclamation-circle-fill'; }
+
+  return `<div class="card-dark" style="border-left:4px solid ${relColor}">
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <i class="bi ${relIcon}" style="color:${relColor};font-size:1.1rem"></i>
+      <span style="font-weight:700;color:${relColor}">${rel}</span>
+      <span class="text-muted small ms-auto">Tanimoto = <strong>${tan.toFixed(3)}</strong> vs <em>${nearest}</em></span>
+    </div>
+    <p class="small mb-2">
+      The novel drug is most chemically similar to <strong>${nearest}</strong> (Tanimoto ${tan.toFixed(3)}).
+      Top predicted resistance genes: <strong>${top3.map(r=>`<em>${r.name}</em>`).join(', ')}</strong>.
+    </p>
+    <p class="small mb-1 text-muted">
+      <i class="bi bi-info-circle me-1"></i>
+      No TP/ZS tags shown here since this is a novel drug not present in CARD — ground truth is unknown.
+      Tanimoto similarity is your reliability guide: ≥0.5 = high, 0.25–0.5 = moderate, &lt;0.25 = exploratory.
+    </p>
+  </div>`;
+}
+
+// ── Tab switching ──────────────────────────────────────────────────────────
+document.querySelectorAll('[data-tab]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    document.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.predict-panel').forEach(x=>x.style.display='none');
+    a.classList.add('active');
+    document.getElementById('panel-'+a.dataset.tab).style.display='';
+  });
+});
+
+// Open SMILES tab via anchor
+if(location.hash==='#smiles') document.querySelector('[data-tab="smiles"]').click();
+
+// ── Gene search helper ─────────────────────────────────────────────────────
+function makeGeneSearch(inputId, dropdownId, onSelect){
+  const inp = document.getElementById(inputId);
+  const dd  = document.getElementById(dropdownId);
+  let timer;
+  inp.addEventListener('input',()=>{
+    clearTimeout(timer);
+    const q = inp.value.trim();
+    if(!q){ dd.style.display='none'; return; }
+    timer=setTimeout(()=>{
+      fetch(`/api/genes?q=${encodeURIComponent(q)}`).then(r=>r.json()).then(genes=>{
+        if(!genes.length){ dd.style.display='none'; return; }
+        dd.innerHTML=genes.slice(0,12).map(g=>`<div class="search-result-item" data-idx="${g.idx}" data-name="${g.name}" data-aro="${g.aro}" data-desc="${(g.description||'').substring(0,80)}">${g.name} <small>${g.aro}</small></div>`).join('');
+        dd.style.display='';
+        dd.querySelectorAll('.search-result-item').forEach(el=>{
+          el.addEventListener('click',()=>{
+            inp.value=el.dataset.name;
+            dd.style.display='none';
+            onSelect({idx:+el.dataset.idx, name:el.dataset.name, aro:el.dataset.aro, desc:el.dataset.desc});
+          });
+        });
+      });
+    },220);
+  });
+  document.addEventListener('click',e=>{ if(!inp.contains(e.target)&&!dd.contains(e.target)) dd.style.display='none'; });
+}
+
+// ── Gene → Drug ────────────────────────────────────────────────────────────
+let selectedGeneIdx = null;
+makeGeneSearch('geneSearch','geneDropdown',gene=>{
+  selectedGeneIdx=gene.idx;
+  document.getElementById('btnGeneDrug').disabled=false;
+  document.getElementById('selectedGeneInfo').style.display='';
+  document.getElementById('selectedGeneName').textContent=gene.name;
+  document.getElementById('selectedGeneDesc').textContent=gene.desc;
+  document.getElementById('selectedGeneARO').textContent=gene.aro;
+});
+
+document.getElementById('btnGeneDrug').addEventListener('click',()=>{
+  if(selectedGeneIdx==null) return;
+  const model=document.getElementById('globalModel').value;
+  const geneName=document.getElementById('selectedGeneName').textContent;
+  document.getElementById('spinnerGeneDrug').style.display='';
+  document.getElementById('geneDrugResults').style.display='none';
+  fetch('/api/predict/gene-drug',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({gene_idx:selectedGeneIdx,model_name:model})
+  }).then(r=>r.json()).then(rows=>{
+    document.getElementById('spinnerGeneDrug').style.display='none';
+    document.getElementById('geneDrugResults').style.display='';
+    // Verdict
+    document.getElementById('geneDrugVerdict').innerHTML=geneDrugVerdict(rows, geneName);
+    const tpCount=rows.filter(r=>r.is_tp).length;
+    const zsCount=rows.filter(r=>r.is_zs).length;
+    document.getElementById('geneDrugMeta').textContent=`${tpCount} known TPs · ${zsCount} ZS classes`;
+    const maxScore=Math.max(...rows.map(r=>r.score));
+    const tbody=document.getElementById('geneDrugBody');
+    tbody.innerHTML=rows.slice(0,20).map(r=>{
+      const pct=maxScore>0?Math.round(r.score/maxScore*100):0;
+      const isZsTp=r.is_tp&&r.is_zs;
+      const tags=isZsTp
+        ? '<span class="tag tag-zs-tp">ZS+TP</span>'
+        : [r.is_tp?'<span class="tag tag-tp">TP</span>':'', r.is_zs?'<span class="tag tag-zs">ZS</span>':''].filter(Boolean).join(' ');
+      return `<tr class="${r.is_tp?'best':''}">
+        <td>${r.rank}</td><td><strong>${r.name}</strong></td>
+        <td><div class="score-bar-wrap"><div class="score-bar"><div class="score-bar-fill" style="width:${pct}%"></div></div><span class="score-val">${r.score.toFixed(3)}</span></div></td>
+        <td>${r.score.toFixed(4)}</td><td>${tags||'<span class="text-muted small">—</span>'}</td>
+      </tr>`;
+    }).join('');
+  }).catch(err=>{ document.getElementById('spinnerGeneDrug').style.display='none'; console.error(err); });
+});
+
+// ── Drug → Gene (with live search) ─────────────────────────────────────────
+let selectedDrugIdx = null;
+
+(function(){
+  const inp = document.getElementById('drugSearch');
+  const dd  = document.getElementById('drugDropdown');
+  let timer;
+  inp.addEventListener('input',()=>{
+    clearTimeout(timer);
+    const q = inp.value.trim();
+    if(!q){ dd.style.display='none'; return; }
+    timer=setTimeout(()=>{
+      fetch(`/api/drugs?q=${encodeURIComponent(q)}`).then(r=>r.json()).then(drugs=>{
+        if(!drugs.length){ dd.style.display='none'; return; }
+        dd.innerHTML=drugs.map(d=>`<div class="search-result-item" data-idx="${d.idx}" data-name="${d.name}" data-zs="${d.is_zs?1:0}">
+          ${d.name} ${d.is_zs?'<small class="text-accent">★ ZS</small>':'<small class="text-muted">training</small>'}
+        </div>`).join('');
+        dd.style.display='';
+        dd.querySelectorAll('.search-result-item').forEach(el=>{
+          el.addEventListener('click',()=>{
+            inp.value=el.dataset.name;
+            dd.style.display='none';
+            selectedDrugIdx=+el.dataset.idx;
+            document.getElementById('btnDrugGene').disabled=false;
+            document.getElementById('selectedDrugInfo').style.display='';
+            document.getElementById('selectedDrugName').textContent=el.dataset.name;
+            const zsBadge=document.getElementById('selectedDrugZsBadge');
+            if(+el.dataset.zs){ zsBadge.style.display=''; } else { zsBadge.style.display='none'; }
+            document.getElementById('selectedDrugIdx').textContent=`Drug class index: ${el.dataset.idx}`;
+            // Auto-trigger prediction
+            document.getElementById('btnDrugGene').click();
+          });
+        });
+      });
+    },220);
+  });
+  document.addEventListener('click',e=>{ if(!inp.contains(e.target)&&!dd.contains(e.target)) dd.style.display='none'; });
+})();
+
+document.getElementById('btnDrugGene').addEventListener('click',()=>{
+  if(selectedDrugIdx==null) return;
+  const top_k=+document.getElementById('drugTopK').value||30;
+  const model=document.getElementById('globalModel').value;
+  const drugName=document.getElementById('selectedDrugName').textContent;
+  document.getElementById('spinnerDrugGene').style.display='';
+  document.getElementById('drugGeneResults').style.display='none';
+  fetch('/api/predict/drug-gene',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({drug_idx:selectedDrugIdx,model_name:model,top_k})
+  }).then(r=>r.json()).then(data=>{
+    document.getElementById('spinnerDrugGene').style.display='none';
+    document.getElementById('drugGeneResults').style.display='';
+    // Verdict
+    document.getElementById('drugGeneVerdict').innerHTML=drugGeneVerdict(data, drugName, top_k);
+    const prec=(data.precision_at_k||0).toFixed(3);
+    document.getElementById('precNum').textContent=prec;
+    document.getElementById('precLbl').textContent=`Precision@${top_k}`;
+    document.getElementById('precDetail').innerHTML=`${data.n_true_positives} known TPs in CARD<br>${(data.results||[]).filter(r=>r.is_tp).length} found in top-${top_k}`;
+    const tbody=document.getElementById('drugGeneBody');
+    tbody.innerHTML=(data.results||[]).map(r=>`<tr class="${r.is_tp?'best':''}">
+      <td>${r.rank}</td>
+      <td><strong>${r.name}</strong><br><span class="text-muted" style="font-size:.78rem">${(r.description||'').substring(0,60)}</span></td>
+      <td><span class="tag tag-zs" style="font-size:.72rem">${r.aro}</span></td>
+      <td>${r.score.toFixed(4)}</td>
+      <td>${r.is_tp?'<span class="tag tag-tp">✓ TP</span>':'<span class="text-muted small">—</span>'}</td>
+    </tr>`).join('');
+  }).catch(err=>{ document.getElementById('spinnerDrugGene').style.display='none'; console.error(err); });
+});
+
+// ── Novel SMILES ───────────────────────────────────────────────────────────
+document.querySelectorAll('.example-smiles').forEach(btn=>{
+  btn.addEventListener('click',()=>{ document.getElementById('smilesInput').value=btn.dataset.smiles; });
+});
+
+document.getElementById('btnSmiles').addEventListener('click',()=>{
+  const smiles=document.getElementById('smilesInput').value.trim();
+  if(!smiles) return;
+  const top_k=+document.getElementById('smilesTopK').value||30;
+  document.getElementById('spinnerSmiles').style.display='';
+  document.getElementById('smilesResults').style.display='none';
+  fetch('/api/predict/smiles',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({smiles,top_k})
+  }).then(r=>{ if(!r.ok) return r.json().then(e=>{throw new Error(e.detail||'Error');}); return r.json(); })
+  .then(data=>{
+    document.getElementById('spinnerSmiles').style.display='none';
+    document.getElementById('smilesResults').style.display='';
+    // Verdict
+    document.getElementById('smilesVerdict').innerHTML=smilesVerdict(data, top_k);
+    document.getElementById('nearestDrug').textContent=data.nearest_drug||'—';
+    const tan=data.tanimoto||0;
+    document.getElementById('tanScore').textContent=tan.toFixed(3);
+    document.getElementById('tanFill').style.width=Math.round(tan*100)+'%';
+    document.getElementById('tanFill').style.background=tan>=0.5?'#3fb950':tan>=0.3?'#58a6ff':'#d29922';
+    document.getElementById('fpDim').textContent=data.fp_dim||3245;
+    const tbody=document.getElementById('smilesBody');
+    tbody.innerHTML=(data.results||[]).map(r=>`<tr>
+      <td>${r.rank}</td>
+      <td><strong>${r.name}</strong></td>
+      <td><span class="tag tag-zs" style="font-size:.72rem">${r.aro}</span></td>
+      <td>${r.score.toFixed(4)}</td>
+      <td class="text-muted small">${(r.description||'').substring(0,60)}</td>
+    </tr>`).join('');
+  }).catch(err=>{
+    document.getElementById('spinnerSmiles').style.display='none';
+    alert('Error: '+err.message);
+  });
+});
+
+// ── Compare Models ─────────────────────────────────────────────────────────
+let compareGeneIdx=null;
+makeGeneSearch('compareGeneSearch','compareGeneDropdown',gene=>{
+  compareGeneIdx=gene.idx;
+  document.getElementById('btnCompare').disabled=false;
+});
+
+document.getElementById('btnCompare').addEventListener('click',()=>{
+  if(compareGeneIdx==null) return;
+  document.getElementById('spinnerCompare').style.display='';
+  document.getElementById('compareResults').style.display='none';
+  fetch('/api/predict/compare',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({gene_idx:compareGeneIdx})
+  }).then(r=>r.json()).then(data=>{
+    document.getElementById('spinnerCompare').style.display='none';
+    document.getElementById('compareResults').style.display='';
+    const cols=document.getElementById('compareColumns');
+    cols.innerHTML='';
+    Object.entries(data).forEach(([mn,rows])=>{
+      const maxS=Math.max(...rows.map(r=>r.score));
+      const col=document.createElement('div');
+      col.className='col-lg-4';
+      col.innerHTML=`<div class="card-dark h-100">
+        <h6 class="mb-3"><span class="model-badge">${mn.replace('_',' ')}</span></h6>
+        <table class="result-table" style="font-size:.8rem">
+          <thead><tr><th>#</th><th>Drug Class</th><th>Score</th></tr></thead>
+          <tbody>${rows.slice(0,10).map((r,i)=>`<tr class="${r.is_zs&&i<3?'best':''}">
+            <td>${i+1}</td>
+            <td>${r.name}${r.is_zs?' <span class="tag tag-zs" style="font-size:.65rem">ZS</span>':''}</td>
+            <td><div class="score-bar-wrap"><div class="score-bar"><div class="score-bar-fill" style="width:${Math.round(r.score/maxS*100)}%"></div></div><span class="score-val">${r.score.toFixed(3)}</span></div></td>
+          </tr>`).join('')}</tbody>
+        </table>
+      </div>`;
+      cols.appendChild(col);
+    });
+  }).catch(err=>{ document.getElementById('spinnerCompare').style.display='none'; console.error(err); });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,10 @@
+{
+  "model": "esm2_t12_35M_UR50D",
+  "emb_dim": 480,
+  "n_genes": 6397,
+  "n_with_seq": 6311,
+  "n_without_seq": 86,
+  "coverage_pct": 98.66,
+  "max_seq_len": 1022,
+  "normalized": true
+}

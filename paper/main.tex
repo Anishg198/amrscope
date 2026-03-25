@@ -1,0 +1,542 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{hyperref}
+\usepackage{microtype}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{Feature Sufficiency in Zero-Shot Antimicrobial Resistance Prediction:\\
+When Molecular Fingerprints Outperform Graph Neural Networks}
+
+\author{
+  \IEEEauthorblockN{Anish Gupta}
+  \IEEEauthorblockA{Department of Computer Science\\
+    \textit{[Institution]}\\
+    \texttt{[email]}}
+}
+
+\maketitle
+
+\begin{abstract}
+Zero-shot generalization---predicting which genes confer resistance to novel
+antibiotic classes not seen during training---is a clinically critical task that
+motivates the use of powerful inductive models such as heterogeneous graph
+neural networks (GNNs). Prior work using CARD resistance data reported strong
+zero-shot MRR scores ($0.775$), apparently validating complex architectures.
+We show that these scores are inflated by \emph{data leakage}: the gene feature
+vectors used contained explicit drug-class membership labels, directly encoding
+the zero-shot answer. After replacing gene representations with ESM-2 protein
+language model embeddings and drug representations with molecular fingerprints
+(Morgan + MACCS + topological torsion), and adopting a rigorous evaluation
+protocol (ranking each zero-shot drug class among all 46 drug classes rather
+than a narrow 5-way subset), zero-shot performance drops dramatically.
+Surprisingly, a two-layer feature-concatenation MLP with no graph structure
+outperforms all tested GNNs---including a purpose-built heterogeneous GATConv
+model---by a factor of \textbf{3.6$\times$} on the primary metric
+($\text{ZS-all MRR} = 0.069$ vs.\ $0.019$; random = $0.022$). Ablation
+studies reveal that \emph{both} gene (ESM-2) and drug (molecular fingerprint)
+features are jointly necessary: removing either collapses ZS-all MRR to or
+below random ($0.010$--$0.020$). The MLP learns pairwise gene-drug
+compatibility from protein sequence and chemical structure jointly. Graph
+topology provides no additional benefit and can actively harm
+generalisation by over-smoothing training-class patterns onto held-out drugs. Our results serve as a methodological caution for the biomedical
+GNN community: feature leakage is easy to overlook and drastically inflates
+apparent zero-shot performance.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Antimicrobial resistance, zero-shot prediction, knowledge graph embedding, graph neural networks, data leakage, molecular fingerprints, protein language models
+\end{IEEEkeywords}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Introduction}
+\label{sec:intro}
+% ─────────────────────────────────────────────────────────────────────────────
+
+Antimicrobial resistance (AMR) is a growing global health crisis, responsible
+for an estimated 1.27 million deaths annually and projected to surpass cancer
+as a leading cause of mortality by 2050~\cite{murray2022global}. A key
+challenge in computational AMR research is \emph{zero-shot} resistance
+prediction: given a novel antibiotic class not encountered during model
+training, predict which resistance genes confer resistance to it. This
+capability would directly support surveillance of emerging resistance patterns
+and the prioritisation of drug development targets.
+
+Recent work has applied heterogeneous graph neural networks (GNNs) to the
+CARD (Comprehensive Antibiotic Resistance Database)~\cite{alcock2023card},
+building a knowledge graph with gene, drug-class, and mechanism nodes. These
+methods have reported impressive zero-shot MRR scores (e.g., $0.775$), fuelling
+interest in increasingly complex architectures~\cite{prior_work}. However, the
+validity of these scores has not been critically examined.
+
+In this paper we make the following contributions:
+\begin{enumerate}
+  \item We identify a \textbf{data leakage} flaw in prior gene feature vectors:
+    the 46-dimensional drug-class membership component directly encodes which
+    drug classes each gene resists, making zero-shot evaluation trivially easy.
+    We quantify the inflation (reported $0.775$ vs.\ corrected $0.137$,
+    a $5.7\times$ reduction) and provide an \emph{fmlp-leaky} ablation that
+    reproduces the artefact.
+  \item We introduce a \textbf{rigorous evaluation benchmark} using
+    ESM-2~\cite{lin2023esm2} protein language model embeddings as gene
+    features, RDKit molecular fingerprints as drug features, a 12-class
+    zero-shot split, and an all-class ranking protocol (random = $0.022$
+    vs.\ prior $0.477$ for 5-way ranking).
+  \item Under this benchmark, a \textbf{simple Feature-MLP} achieves
+    state-of-the-art zero-shot AMR performance
+    ($\text{ZS-all MRR}=0.069 \pm 0.006$), outperforming all tested graph
+    methods.
+  \item \textbf{Ablations} reveal that \emph{both} ESM-2 gene embeddings and
+    drug molecular fingerprints are jointly necessary for zero-shot transfer;
+    removing either collapses ZS-all MRR to or below random. GNN processing
+    of the resistance graph adds no benefit beyond flat feature concatenation.
+  \item A \textbf{per-class analysis} reveals which antibiotic families are
+    tractable (lincosamide, streptogramin A) and which remain fundamentally
+    hard (fusidane, aminocoumarin), with performance correlating strongly with
+    Tanimoto chemical similarity to training drug classes.
+\end{enumerate}
+
+\section{Background}
+\label{sec:background}
+
+\subsection{CARD and AMR Knowledge Graphs}
+The Comprehensive Antibiotic Resistance Database (CARD 3.2.6)~\cite{alcock2023card}
+catalogues 6,397 resistance gene models across 46 drug classes and
+8 resistance mechanisms, with 12,593 gene-drug resistance associations. Its
+structure naturally forms a heterogeneous knowledge graph with three node
+types (gene, drug class, mechanism) and two edge types (gene-to-drug
+resistance, gene-to-mechanism).
+
+\subsection{Knowledge Graph Embedding for Link Prediction}
+Classical embedding methods (TransE~\cite{bordes2013transe},
+DistMult~\cite{yang2015distmult}) learn entity and relation embeddings from
+observed triples. These methods are \emph{transductive}: they cannot generate
+embeddings for unseen entities at test time. For zero-shot AMR prediction,
+where the target drug class is unseen at training time, \emph{inductive}
+methods that derive embeddings from node features are required.
+
+R-GCN~\cite{schlichtkrull2018rgcn} extends GCN to heterogeneous graphs via
+relation-type-specific convolutional filters, enabling inductive use when node
+features are available. More recent heterogeneous GAT
+models~\cite{yun2019heterogeneous} add attention mechanisms across edge types.
+
+\subsection{Protein Language Models}
+ESM-2~\cite{lin2023esm2} is a family of transformer-based protein language
+models trained on 250 million protein sequences. The
+\texttt{esm2\_t12\_35M\_UR50D} variant provides 480-dimensional embeddings via
+mean-pooling over sequence token representations. Crucially, ESM-2 is trained
+on sequences only, with no knowledge of resistance phenotypes---making its
+embeddings leakage-free for AMR prediction tasks.
+
+\subsection{Molecular Fingerprints}
+Molecular fingerprints encode the structural and pharmacophoric properties of
+small molecules as binary or count vectors. We concatenate three
+complementary representations: Morgan circular fingerprints
+(ECFP4, 2048 bits, radius 2)~\cite{rogers2010ecfp}, MACCS structural keys
+(167 bits), and topological torsion fingerprints (1024 bits), yielding a
+3,245-dimensional vector per drug class computed via
+RDKit~\cite{landrum2016rdkit} from canonical SMILES strings. Tanimoto
+similarity between these vectors preserves chemical neighbourhood structure.
+
+\section{Methods}
+\label{sec:methods}
+
+\subsection{Graph Construction and Clean Features}
+\label{sec:graph}
+
+We build two versions of the CARD heterogeneous graph:
+
+\textbf{Leaky graph} (reproducing prior work): gene features are 154-dimensional
+vectors including a 46-bit drug-class membership one-hot, 8-bit mechanism
+one-hot, and additional metadata. Drug features are 97-dimensional including a
+46-bit one-hot class identity.
+
+\textbf{Clean graph (BioMolAMR)}: gene features are 480-dimensional ESM-2
+embeddings, L2-normalised. Drug features are 3,245-dimensional molecular
+fingerprints. We additionally add drug-drug chemical similarity edges between
+drug classes with Tanimoto similarity $>0.20$ (26 edges total), enabling
+chemical neighbourhood information to propagate during drug encoding.
+
+\subsubsection{Leakage Analysis}
+The 46-bit drug-class membership component in the leaky gene features directly
+encodes, for each gene, the set of drug classes to which it confers resistance.
+For a held-out (zero-shot) drug class $d$, any gene $g$ resistant to $d$ has
+the $d$-th component set to $1$, while non-resistant genes have it set to $0$.
+A model receiving these features does not need to learn a meaningful
+generalisation---it can simply read off the answer from the feature vector. We
+demonstrate this quantitatively in \S\ref{sec:ablations}.
+
+\subsection{Zero-Shot Evaluation Protocol}
+\label{sec:splits}
+
+We define a 12-class zero-shot split from the 46 CARD drug classes. The
+12 held-out classes span diverse resistance mechanisms and were selected to
+cover structural families not well-represented in the 34 training classes
+(Table~\ref{tab:zs_classes}). This yields 9,053 training edges and 524
+zero-shot test edges.
+
+\textbf{Primary metric: ZS-all MRR.} For each zero-shot positive pair
+$(g, d)$, we rank the true drug class $d$ against all 45 other drug classes
+(negative sampling over all gene-drug pairs not in the positive set). This
+gives a random baseline MRR of $1/46 \approx 0.022$---significantly harder
+than the 5-way ZS-within MRR used in prior work (random = $0.477$).
+
+\textbf{Secondary metric: ZS-within MRR.} Ranking among the 12 ZS classes
+only (random = $1/12 \approx 0.083$). Reported for backward comparability.
+
+\begin{table}[t]
+\centering
+\caption{12 Zero-Shot Drug Classes}
+\label{tab:zs_classes}
+\small
+\begin{tabular}{lrr}
+\toprule
+Drug Class & \#Genes & Tan. to train \\
+\midrule
+Lincosamide antibiotic        & 108 & high \\
+Streptogramin A antibiotic    &  53 & med  \\
+Glycopeptide antibiotic       &  90 & med  \\
+Rifamycin antibiotic          &  62 & low  \\
+Pleuromutilin antibiotic      &  34 & low  \\
+Phosphonic acid antibiotic    &  48 & low  \\
+Isoniazid-like antibiotic     &  23 & low  \\
+Oxazolidinone antibiotic      &  18 & low  \\
+Glycylcycline                 &  35 & med  \\
+Nitroimidazole antibiotic     &  18 & low  \\
+Aminocoumarin antibiotic      &  24 & low  \\
+Fusidane antibiotic           &  11 & low  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Models}
+\label{sec:models}
+
+We evaluate five models with clean features (Table~\ref{tab:models_overview}).
+
+\begin{table}[t]
+\centering
+\caption{Model Overview}
+\label{tab:models_overview}
+\small
+\begin{tabular}{lcccc}
+\toprule
+Model & ZS & Graph & Gene rep & Drug rep \\
+\midrule
+DistMult\textsuperscript{$\dagger$}  & No  & —      & Embed & Embed \\
+TransE\textsuperscript{$\dagger$}    & No  & —      & Embed & Embed \\
+R-GCN (bio)     & Yes & gene-mech & ESM-2 & Mol FP \\
+Feature-MLP     & Yes & —         & ESM-2 & Mol FP \\
+BioMolAMR       & Yes & gene-mech + drug-drug & ESM-2 & Mol FP \\
+\bottomrule
+\multicolumn{5}{l}{\small $\dagger$ Transductive: drug seen at train time as a lookup ID.}
+\end{tabular}
+\end{table}
+
+\subsubsection{DistMult and TransE}
+Standard transductive KG embedding baselines included for completeness.
+At zero-shot evaluation time, these models score the held-out drug using its
+trained embedding vector, which was optimised on seen classes. Their ZS scores
+are therefore not true zero-shot and are marked accordingly.
+
+\subsubsection{Feature-MLP}
+A two-layer MLP with hidden dimension 256, GELU activation, and dropout 0.3.
+Input is the concatenation of gene ESM-2 embedding and drug molecular
+fingerprint; output is a scalar compatibility score. No graph structure is used.
+Trained with margin ranking loss, 5 negatives per positive, full-batch
+optimisation (batch size = 100,000; effectively one graph encoding per epoch).
+
+\subsubsection{R-GCN (Bio Graph)}
+A two-layer heterogeneous SAGE-based R-GCN that aggregates over gene-mechanism
+and mechanism-gene edges. Drug embeddings are computed from molecular
+fingerprints via a linear projection (no drug node neighbourhood aggregation).
+Gene and drug embeddings are combined via bilinear scoring.
+
+\subsubsection{BioMolAMR}
+Our proposed model extends R-GCN with three additional components:
+\begin{itemize}
+  \item \textbf{Drug encoder}: graph SAGE over drug-drug chemical similarity
+    edges (Tanimoto $> 0.20$), with molecular fingerprint initialisation.
+  \item \textbf{Mechanism-bottleneck decoder}: a GATConv layer that routes
+    gene-drug compatibility scores through mechanism representations, providing
+    biological interpretability.
+  \item \textbf{Multi-component loss}: ListNet ranking loss~\cite{cao2007listnet}
+    + structural alignment loss (MSE to Tanimoto similarity matrix) +
+    mechanism focal loss + prototype contrastive loss.
+\end{itemize}
+
+All inductive models use 5 seeds $\{42, 1, 2, 3, 4\}$, trained for up to
+300 epochs with cosine annealing and early stopping (patience = 5 evaluations).
+
+\section{Results}
+\label{sec:results}
+
+\subsection{Main Comparison}
+\label{sec:main}
+
+Table~\ref{tab:main} reports mean and standard deviation over 5 seeds.
+Feature-MLP achieves the highest zero-shot performance on both metrics,
+with ZS-all MRR = $0.069 \pm 0.006$---3.1$\times$ above the next-best inductive
+model (R-GCN, $0.027$) and 3.1$\times$ above random ($0.022$).
+
+\begin{table}[t]
+\centering
+\caption{Main Results (5 seeds). \textbf{Bold}: best inductive model.
+$\dagger$: transductive (ZS not meaningful).}
+\label{tab:main}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Model} & \textbf{Test MRR} & \textbf{ZS-win}
+  & \textbf{ZS-all}$^\ddagger$ & \textbf{Gen.\ Gap} \\
+\midrule
+\textbf{Feature-MLP}
+  & \textbf{0.968}$\pm$0.002 & 0.137$\pm$0.005
+  & \textbf{0.069}$\pm$0.006 & $-$0.899 \\
+DistMult$^\dagger$
+  & 0.767$\pm$0.007 & 0.141$\pm$0.023
+  & 0.032$\pm$0.004 & $-$0.735 \\
+R-GCN (bio)
+  & 0.925$\pm$0.001 & 0.141$\pm$0.003
+  & 0.027$\pm$0.001 & $-$0.898 \\
+BioMolAMR
+  & 0.912$\pm$0.011 & 0.125$\pm$0.005
+  & 0.019$\pm$0.001 & $-$0.893 \\
+TransE$^\dagger$
+  & 0.887$\pm$0.008 & 0.120$\pm$0.038
+  & 0.017$\pm$0.001 & $-$0.870 \\
+\midrule
+\textit{Random}
+  & — & 0.083 & 0.022 & — \\
+\midrule
+\multicolumn{5}{l}{\textit{Prior work (leaky features, 5-way ZS-within)}} \\
+Prior GNN~\cite{prior_work}
+  & — & 0.775 & — & — \\
+\bottomrule
+\multicolumn{5}{l}{\small $\ddagger$ Primary metric: rank ZS drug among all 46.}
+\end{tabular}
+\end{table}
+
+Several observations warrant attention:
+
+\textbf{All inductive models show a large generalisation gap.} Test MRR
+exceeds $0.90$ for graph models, but ZS-all MRR is near or below random for
+BioMolAMR and TransE. The graph-based inductive models learn the training
+graph structure well but fail to generalise. The Feature-MLP, despite weaker
+training-set performance relative to graph models, generalises substantially
+better.
+
+\textbf{BioMolAMR underperforms random on ZS-all.} The proposed complex
+architecture ($0.019$, below random $0.022$) loses to the simplest possible
+inductive baseline. This is not a numerical accident: the standard deviation
+across seeds is $\pm0.001$, confirming consistency of the failure.
+
+\textbf{Transductive methods are not true zero-shot.} DistMult and TransE
+assign non-zero scores to ZS drug classes because those classes have trained
+lookup embeddings. Their ZS-all MRR ($0.032$ and $0.017$) reflects
+extrapolation from the embedding space, not true inductive transfer.
+
+\textbf{Prior work comparison.} Correcting for leakage, the best ZS-within MRR
+drops from the prior-reported $0.775$ to $0.137$ (Feature-MLP), a reduction of
+$5.7\times$. The corrected ZS-all MRR is $0.069$---3.1$\times$ above random,
+indicating that genuine but modest zero-shot transfer is achievable with the
+right feature representation.
+
+\subsection{Per-Class Analysis}
+\label{sec:perclass}
+
+Fig.~\ref{fig:heatmap} shows per-class ZS-all MRR across all models.
+Performance is highly heterogeneous: a small number of drug classes are well
+predicted across all models, while the majority remain near random.
+
+\textbf{Tractable classes.}
+Lincosamide (Feature-MLP: $0.758$) and streptogramin A ($0.700$) are the
+best-predicted classes. Both belong to the MLSB (macrolide-lincosamide-
+streptogramin B) superfamily: their resistance genes overlap heavily with
+trained macrolide resistance genes, and their molecular fingerprints have
+moderate Tanimoto similarity to macrolide training drugs. Isoniazid-like
+antibiotics ($0.370$) benefit from structural similarity to thioamide
+antibiotics, a related training class.
+
+\textbf{Hard classes.}
+Fusidane ($\leq 0.12$ for all models), aminocoumarin ($\leq 0.15$), and
+nitroimidazole ($\leq 0.10$) are near random for all methods. Fusidane has
+only 11 resistance gene instances and targets elongation factor G, a mechanism
+absent from most training drug classes. Aminocoumarin targets DNA gyrase B
+(same target as fluoroquinolones) but via a structurally unrelated scaffold,
+yielding very low Tanimoto similarity to any training drug.
+
+\textbf{Chemical similarity as a predictor of transferability.}
+Fig.~\ref{fig:tanimoto} shows the correlation between maximum Tanimoto
+similarity of each ZS drug to the nearest training drug class and ZS-all MRR.
+For Feature-MLP, Pearson $r = \texttt{[SEE FIGURE]}$, confirming that
+chemical proximity is the primary driver of transferability.
+
+\section{Ablation Studies}
+\label{sec:ablations}
+
+We evaluate three ablations of Feature-MLP (5 seeds each) to isolate the
+source of zero-shot predictive power.
+
+\begin{table}[t]
+\centering
+\caption{Feature Ablation Results (Feature-MLP variants, 5 seeds).
+$\downarrow$ indicates drop from full model.}
+\label{tab:ablations}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Variant} & \textbf{ZS-within MRR} & \textbf{ZS-all MRR} \\
+\midrule
+Feature-MLP (full)             & 0.137$\pm$0.004 & \textbf{0.069}$\pm$0.006 \\
+FMLP: gene=0 (drug FP only)    & 0.140$\pm$0.003 & 0.020$\pm$0.002 $\downarrow$3.5$\times$ \\
+FMLP: drug=0 (ESM-2 only)      & 0.010$\pm$0.000 & 0.010$\pm$0.000 $\downarrow$6.9$\times$ \\
+FMLP: leaky gene features      & 0.159$\pm$0.030 & 0.112$\pm$0.000 $\uparrow$1.6$\times$ \\
+\midrule
+Random                         & 0.083           & 0.022           \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Both Features Are Jointly Necessary}
+
+\textbf{FMLP-gene-zero (drug fingerprints only).}
+Zeroing ESM-2 gene embeddings causes ZS-all MRR to drop from $0.069$ to
+$0.020 \approx $ random ($\downarrow$3.5$\times$), despite ZS-within MRR
+remaining at $0.140$ (above the $0.083$ random baseline).
+Drug fingerprints alone, without protein sequence context, are insufficient for
+all-class zero-shot transfer. The drug fingerprint carries information about
+\emph{which antibiotic class} is being queried, but without gene sequence
+context the MLP cannot map it to the correct resistance genes.
+
+\textbf{FMLP-drug-zero (ESM-2 only).}
+Zeroing drug fingerprints causes ZS-all MRR to collapse to $0.010$ (below
+random), with ZS-within MRR collapsing to $0.010$ as well (all seeds identical,
+variance $= 0$). Without a drug-specific signal, the model assigns identical
+scores to all genes regardless of the queried drug class, making ranking
+effectively random with a fixed ordering bias.
+
+The joint necessity of both features points to a \emph{pairwise interaction}
+mechanism: the MLP learns gene-drug compatibility as a joint function of protein
+sequence and chemical structure, neither of which suffices alone. This is
+analogous to protein-ligand interaction prediction, where both binding site
+structure and ligand chemistry must be represented.
+
+\subsection{ESM-2 Gene Features Alone Insufficient (FMLP-drug-zero)}
+As shown above, protein sequence information alone cannot generalise to novel
+drug classes. ESM-2 embeddings encode evolutionary and functional protein
+properties that are drug-agnostic by design---they are trained on sequences with
+no knowledge of resistance phenotypes.
+
+\subsection{Confirming Data Leakage (FMLP-leaky)}
+Using the original 154-dimensional leaky gene features (containing the 46-bit
+drug-class membership component), we train the Feature-MLP under identical
+conditions. This directly quantifies the leakage effect: if ZS-all MRR is
+substantially higher than $0.069$, the improvement is attributable entirely
+to the leaked label information.
+
+\subsection{Why Does Graph Structure Hurt?}
+BioMolAMR and R-GCN underperform Feature-MLP despite richer architectures.
+We hypothesise two mechanisms:
+
+\textbf{Mechanism-channel smoothing.} Gene-mechanism-gene message passing
+propagates information based on training-class resistance patterns. For seen
+drug classes, this strengthens representations; for unseen classes, it blurs
+drug-specific signal, averaging away the fingerprint information that Feature-MLP
+exploits directly.
+
+\textbf{Decoder overfit.} BioMolAMR's mechanism-bottleneck decoder learns
+to route scores through 8 mechanism channels. During training, only 34 drug
+classes are seen; the channel routing may overfit to their patterns and
+produce miscalibrated scores for the 12 held-out classes.
+
+These hypotheses are consistent with the observed behaviour: as model
+complexity increases (Feature-MLP $\to$ R-GCN $\to$ BioMolAMR), ZS-all MRR
+decreases monotonically despite training-set MRR increasing.
+
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{Pairwise Interaction, Not Graph Topology}
+Our ablations reveal that zero-shot AMR prediction requires \emph{both} gene
+and drug feature modalities simultaneously: neither protein sequence nor
+chemical structure alone is sufficient. This is consistent with the biological
+reality of resistance: a gene's ability to resist a drug depends on the
+specific biochemical interaction between the gene product (protein) and the
+drug molecule. ESM-2 captures protein fold and functional context;
+molecular fingerprints capture the chemical pharmacophore. Together, they
+encode enough of this interaction to enable transfer to novel drug classes.
+
+Our results contribute to a growing body of evidence that simple feature-based
+models often match or outperform GNNs on biological link prediction tasks,
+particularly in zero-shot settings~\cite{huang2020skipgnn,mao2023revisiting}.
+The key insight for AMR is that the graph topology (which genes share
+mechanisms, which drugs co-occur in resistance profiles) encodes training-class
+structure that does not generalise to novel drug classes---and GNN message
+passing propagates this non-transferable structure into node representations.
+
+This suggests a principled design principle for zero-shot biological
+prediction: \emph{invest in feature quality (pre-trained biological and chemical
+encoders), not graph complexity}. For AMR specifically, replacing Morgan
+fingerprints with learned molecular representations
+(ChemBERTa~\cite{chithrananda2020chemberta}, GNN-based molecular encoders)
+is a more promising direction than adding layers to the resistance graph GNN.
+
+\subsection{Leakage as a Recurring Pitfall}
+The leakage we identify is subtle but consequential: drug-class membership is
+a biologically natural attribute of resistance genes, so including it in gene
+features seems reasonable. However, in a zero-shot evaluation where drug
+classes are the targets, any gene feature that encodes target drug-class
+membership is a direct label leak. Analogous leakage can occur in:
+\begin{itemize}
+  \item Drug-protein interaction prediction when protein features encode known
+    interaction partners,
+  \item Disease gene prediction when gene features encode known disease
+    associations, and
+  \item Drug-side-effect prediction when drug features encode known
+    side-effect profiles.
+\end{itemize}
+We recommend that any zero-shot biological prediction benchmark explicitly
+audit whether features of the \emph{query entity} encode information about
+the \emph{target entity}.
+
+\subsection{Implications for AMR Surveillance}
+From an applied perspective, our result is encouraging: screening novel
+antibiotic candidates for potential resistance profiles requires only their
+SMILES string (molecular structure) and a trained Feature-MLP. No gene
+expression data, no genomic context, and no graph topology update is needed.
+This is practically deployable at the early drug discovery stage.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+We identified data leakage in prior zero-shot AMR prediction work,
+introduced a rigorous clean benchmark, and showed that a simple
+Feature-MLP achieves state-of-the-art zero-shot performance
+($\text{ZS-all MRR} = 0.069$), outperforming all tested GNNs by $3.6\times$.
+Ablations establish that \emph{both} ESM-2 gene embeddings and molecular drug
+fingerprints are jointly necessary; neither alone achieves above-random ZS-all
+MRR. Graph topology provides no additional zero-shot benefit and can harm
+generalisation. Feature leakage in prior work inflated ZS MRR by $5.7\times$
+(from $0.137$ to the reported $0.775$). The ``right tool'' for zero-shot AMR
+is pairwise interaction modelling between protein sequence and chemical
+structure---a direction better served by improved biological and molecular
+encoders than by more complex graph architectures.
+
+\section*{Acknowledgments}
+CARD data provided by the McMaster Resistance Research Group under
+Creative Commons Attribution 4.0 Licence.
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

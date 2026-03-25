@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+{% block title %}About — BioMolAMR{% endblock %}
+
+{% block content %}
+<div class="container-xl py-5">
+
+  <div class="row g-5">
+    <!-- Left column: paper summary -->
+    <div class="col-lg-8">
+
+      <h1 class="section-title mb-1">About BioMolAMR</h1>
+      <p class="section-sub">Zero-Shot Antimicrobial Resistance Prediction via Protein–Chemical Compatibility</p>
+
+      <!-- Abstract -->
+      <div class="card-dark mb-4">
+        <h5 class="mb-3">Abstract</h5>
+        <p class="small" style="line-height:1.75;color:var(--text)">
+          Antimicrobial resistance (AMR) poses a critical global health threat.
+          Computational prediction of resistance associations between genes and novel antibiotic drug classes —
+          <em>zero-shot generalization</em> — is essential for proactive surveillance.
+          We audit prior zero-shot AMR methods and uncover a systematic data-leakage problem:
+          gene feature vectors encoded 46-dimensional drug-class membership vectors, directly embedding the labels being predicted
+          and inflating zero-shot MRR by 5.7×.
+        </p>
+        <p class="small" style="line-height:1.75;color:var(--text)">
+          With this leakage removed, we show that clean pairwise compatibility scoring between
+          ESM-2 protein embeddings and molecular fingerprints (Feature-MLP) achieves ZS-all MRR 0.069 —
+          3.1× above a random baseline of 0.022 — outperforming graph neural network architectures including
+          our proposed BioMolAMR heterogeneous GAT model.
+          Ablation confirms both ESM-2 gene embeddings and molecular drug fingerprints are jointly necessary;
+          removing either feature modality collapses performance to or below random.
+          These results demonstrate that direct protein–chemical compatibility is sufficient and dominant
+          for zero-shot AMR transfer; graph topology, while biologically motivated, provides no additional benefit
+          on the current CARD knowledge graph.
+        </p>
+      </div>
+
+      <!-- Methods -->
+      <div class="card-dark mb-4">
+        <h5 class="mb-3">Methods</h5>
+        <div class="row g-4">
+          <div class="col-md-6">
+            <h6 class="text-accent mb-2">Data</h6>
+            <ul class="small ps-3" style="line-height:1.8">
+              <li>CARD v3.2.6: 6,397 resistance genes, 46 drug classes</li>
+              <li>9,053 training gene–drug pairs, 524 ZS test pairs</li>
+              <li>12 drug classes held out for zero-shot evaluation</li>
+              <li>Drug SMILES sourced from PubChem / ChEMBL</li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <h6 class="text-accent mb-2">Gene Features</h6>
+            <ul class="small ps-3" style="line-height:1.8">
+              <li>ESM-2 (esm2_t12_35M_UR50D) protein language model</li>
+              <li>480-dim per-sequence embeddings</li>
+              <li>No drug-class membership information</li>
+              <li>6,397 genes embedded (12 GB GPU, ~45 min)</li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <h6 class="text-accent mb-2">Drug Features</h6>
+            <ul class="small ps-3" style="line-height:1.8">
+              <li>Morgan fingerprint: 2048 bits, radius 2</li>
+              <li>MACCS keys: 167 bits</li>
+              <li>Topological torsion: 1030 bits</li>
+              <li>Combined: 3245-dim binary vector</li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <h6 class="text-accent mb-2">Evaluation Protocol</h6>
+            <ul class="small ps-3" style="line-height:1.8">
+              <li>Primary: ZS-all MRR (rank among all 46 classes)</li>
+              <li>Random baseline: 1/46 ≈ 0.022</li>
+              <li>5-seed mean ± std reported</li>
+              <li>Precision@20 for case study analysis</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Models -->
+      <div class="card-dark mb-4">
+        <h5 class="mb-3">Models Evaluated</h5>
+        <div class="table-responsive">
+          <table class="result-table">
+            <thead>
+              <tr><th>Model</th><th>Type</th><th>Gene Features</th><th>Drug Features</th><th>ZS-all MRR</th></tr>
+            </thead>
+            <tbody>
+              <tr class="best">
+                <td><strong>Feature-MLP</strong></td>
+                <td><span class="tag tag-tp">MLP</span></td>
+                <td>ESM-2 480d</td>
+                <td>MolFP 3245d</td>
+                <td class="text-green"><strong>0.069</strong></td>
+              </tr>
+              <tr>
+                <td>DistMult</td>
+                <td><span class="tag tag-zs">KGE</span></td>
+                <td>ESM-2 480d</td>
+                <td>MolFP 3245d</td>
+                <td>0.032</td>
+              </tr>
+              <tr>
+                <td>R-GCN (bio)</td>
+                <td><span class="tag tag-zs">GNN</span></td>
+                <td>ESM-2 480d</td>
+                <td>MolFP 3245d</td>
+                <td>0.027</td>
+              </tr>
+              <tr>
+                <td>BioMolAMR</td>
+                <td><span class="tag tag-zs">GNN</span></td>
+                <td>ESM-2 480d</td>
+                <td>MolFP 3245d</td>
+                <td>0.019</td>
+              </tr>
+              <tr>
+                <td>TransE</td>
+                <td><span class="tag tag-zs">KGE</span></td>
+                <td>ESM-2 480d</td>
+                <td>MolFP 3245d</td>
+                <td>0.017</td>
+              </tr>
+              <tr class="random">
+                <td>Random</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>0.022</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Prior work comparison -->
+      <div class="card-dark mb-4">
+        <h5 class="mb-3">Comparison with Prior Work</h5>
+        <div class="callout-yellow mb-3">
+          <div class="small"><strong>Prior ZS-within MRR 0.775</strong> was measured on a <em>5-way within-ZS ranking</em>
+          (random = 1/5 = 0.20) with leaky gene features. Our ZS-all MRR uses all 46 classes as negatives
+          (random = 1/46 ≈ 0.022), is far more rigorous, and is unaffected by drug-class leakage.</div>
+        </div>
+        <div class="table-responsive">
+          <table class="result-table">
+            <thead>
+              <tr><th>Evaluation</th><th>Metric</th><th>Random</th><th>Prior Work</th><th>This Work (clean)</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>ZS-within (5-way)</td>
+                <td>MRR</td>
+                <td class="text-muted">0.200</td>
+                <td style="color:var(--red)">0.775 <span class="small">(leaky)</span></td>
+                <td class="text-green">0.137</td>
+              </tr>
+              <tr class="best">
+                <td>ZS-all (46-way)</td>
+                <td>MRR</td>
+                <td class="text-muted">0.022</td>
+                <td class="text-muted">N/A</td>
+                <td class="text-green"><strong>0.069</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- BibTeX -->
+      <div class="card-dark">
+        <h5 class="mb-3">Citation</h5>
+        <pre style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px;font-size:.8rem;overflow-x:auto;color:var(--text)">@inproceedings{biomolamr2025,
+  title   = {BioMolAMR: Zero-Shot Antimicrobial Resistance
+             Prediction via Protein--Chemical Compatibility},
+  author  = {Gupta, Anish},
+  booktitle={Proc. IEEE BIBM},
+  year    = {2025},
+  note    = {Preprint}
+}</pre>
+      </div>
+
+    </div>
+
+    <!-- Right column: quick facts -->
+    <div class="col-lg-4">
+
+      <div class="card-dark mb-4">
+        <h6 class="text-accent mb-3">Quick Facts</h6>
+        <div class="d-flex flex-column gap-2">
+          <div class="d-flex justify-content-between">
+            <span class="text-muted small">Database</span>
+            <span class="small">CARD v3.2.6</span>
+          </div>
+          <hr class="my-1">
+          <div class="d-flex justify-content-between">
+            <span class="text-muted small">Resistance genes</span>
+            <span class="small">6,397</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-muted small">Drug classes</span>
+            <span class="small">46</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-muted small">ZS held-out classes</span>
+            <span class="small">12</span>
+          </div>
+          <hr class="my-1">
+          <div class="d-flex justify-content-between">
+            <span class="text-muted small">Protein LM</span>
+            <span class="small">ESM-2 (35M params)</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-muted small">Gene feat. dim</span>
+            <span class="small">480</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-muted small">Drug feat. dim</span>
+            <span class="small">3,245 (FP)</span>
+          </div>
+          <hr class="my-1">
+          <div class="d-flex justify-content-between">
+            <span class="text-muted small">Best ZS-all MRR</span>
+            <span class="small text-green fw-bold">0.069</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-muted small">Random baseline</span>
+            <span class="small text-muted">0.022</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-muted small">Improvement vs random</span>
+            <span class="small text-green">3.1×</span>
+          </div>
+          <hr class="my-1">
+          <div class="d-flex justify-content-between">
+            <span class="text-muted small">Target venue</span>
+            <span class="small">IEEE BIBM 2025</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-muted small">Models trained</span>
+            <span class="small">5 × 5 seeds = 25 runs</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-dark mb-4">
+        <h6 class="text-accent mb-3">Key Drug Classes</h6>
+        <div class="d-flex flex-column gap-1">
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="small">lincosamide</span>
+            <div class="score-bar" style="width:100px"><div class="score-bar-fill" style="width:100%"></div></div>
+            <span class="score-val">0.760</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="small">streptogramin A</span>
+            <div class="score-bar" style="width:100px"><div class="score-bar-fill" style="width:92%"></div></div>
+            <span class="score-val">0.700</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="small">isoniazid-like</span>
+            <div class="score-bar" style="width:100px"><div class="score-bar-fill" style="width:49%"></div></div>
+            <span class="score-val">0.370</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="small">nitroimidazole</span>
+            <div class="score-bar" style="width:100px"><div class="score-bar-fill" style="width:11%;background:var(--yellow)"></div></div>
+            <span class="score-val">0.080</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="small">fusidane</span>
+            <div class="score-bar" style="width:100px"><div class="score-bar-fill" style="width:1%;background:var(--red)"></div></div>
+            <span class="score-val">0.010</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-dark">
+        <h6 class="text-accent mb-3">Stack</h6>
+        <div class="d-flex flex-wrap gap-2">
+          <span class="model-badge">Python 3.10</span>
+          <span class="model-badge">PyTorch 2.0</span>
+          <span class="model-badge">PyG 2.3</span>
+          <span class="model-badge">ESM-2</span>
+          <span class="model-badge">RDKit</span>
+          <span class="model-badge">FastAPI</span>
+          <span class="model-badge">Bootstrap 5</span>
+          <span class="model-badge">Chart.js</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% block title %}BioMolAMR — Zero-Shot AMR Prediction{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="hero">
+  <div class="container-xl">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-7">
+        <div class="mb-3">
+          <span class="badge-zs">IEEE BIBM 2025</span>
+        </div>
+        <h1 class="hero-title">
+          Zero-Shot<br>
+          <span class="text-accent">Antimicrobial</span><br>
+          Resistance Prediction
+        </h1>
+        <p class="hero-sub mt-3">
+          BioMolAMR predicts which drug classes resistance genes can confer resistance to —
+          including <strong>novel antibiotics never seen during training</strong> — using
+          ESM-2 protein embeddings and molecular fingerprints.
+        </p>
+        <div class="mt-4 d-flex gap-3 flex-wrap">
+          <a href="/predict" class="btn btn-primary px-4 py-2">
+            <i class="bi bi-cpu me-2"></i>Try Predictions
+          </a>
+          <a href="/results" class="btn btn-outline-secondary px-4 py-2">
+            <i class="bi bi-bar-chart me-2"></i>View Results
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-5 d-none d-lg-block">
+        <div class="card-dark text-center py-4">
+          <div class="mb-2 text-muted small text-uppercase" style="letter-spacing:.8px">Primary Metric · ZS-all MRR</div>
+          <div style="font-size:3.5rem;font-weight:800;color:var(--green)">0.069</div>
+          <div class="text-muted small">Feature-MLP · Best Model · 3.1× random</div>
+          <hr>
+          <div class="row g-2 mt-1">
+            <div class="col-6">
+              <div class="text-muted small">Prior work (inflated)</div>
+              <div style="color:var(--red);font-weight:700">0.775</div>
+              <div class="text-muted" style="font-size:.72rem">leaky features</div>
+            </div>
+            <div class="col-6">
+              <div class="text-muted small">Clean evaluation</div>
+              <div style="color:var(--green);font-weight:700">0.069</div>
+              <div class="text-muted" style="font-size:.72rem">this work</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats row -->
+<section class="py-4" style="background:var(--bg2);border-bottom:1px solid var(--border)">
+  <div class="container-xl">
+    <div class="row g-3">
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-num text-accent">{{ n_genes }}</div>
+          <div class="stat-label">Resistance Genes</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-num" style="color:var(--purple)">46</div>
+          <div class="stat-label">Drug Classes</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-num text-green">{{ n_zs }}</div>
+          <div class="stat-label">Zero-Shot Classes</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-num" style="color:var(--yellow)">3</div>
+          <div class="stat-label">Models Evaluated</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Key finding callout -->
+<section class="py-5">
+  <div class="container-xl">
+    <div class="row g-4">
+      <div class="col-lg-6">
+        <h2 class="section-title">Key Finding</h2>
+        <p class="section-sub">Our main scientific contribution</p>
+
+        <div class="callout-red mb-3">
+          <div class="fw-700 mb-1" style="font-weight:700;color:var(--red)">
+            <i class="bi bi-exclamation-triangle me-2"></i>Prior Work Was Inflated 5.7×
+          </div>
+          <div class="small">Gene features included 46-dim drug-class membership vectors —
+          directly encoding which drug classes each gene resists. Zero-shot evaluation became
+          trivial since the answer was embedded in the features.</div>
+        </div>
+
+        <div class="callout-green mb-3">
+          <div class="fw-700 mb-1" style="font-weight:700;color:var(--green)">
+            <i class="bi bi-check-circle me-2"></i>Clean Evaluation: ESM-2 + Mol Fingerprints
+          </div>
+          <div class="small">With protein language model embeddings (ESM-2) and molecular
+          fingerprints (Morgan + MACCS + TopoTorsion), Feature-MLP achieves ZS-all MRR 0.069 —
+          <strong>3.1× above random (0.022)</strong>, genuine zero-shot transfer.</div>
+        </div>
+
+        <div class="callout-blue">
+          <div class="fw-700 mb-1" style="color:var(--accent);font-weight:700">
+            <i class="bi bi-lightbulb me-2"></i>Pairwise Compatibility Is Sufficient
+          </div>
+          <div class="small">Graph topology provides no additional benefit. Direct protein–chemical
+          compatibility scoring outperforms all GNN architectures including the proposed
+          BioMolAMR GAT model. Both feature types are jointly necessary.</div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <h2 class="section-title">Model Comparison</h2>
+        <p class="section-sub">ZS-all MRR (random = 0.022)</p>
+        <div id="homeModelChart" style="max-height:280px"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Architecture overview -->
+<section class="py-5" style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container-xl">
+    <div class="text-center mb-4">
+      <h2 class="section-title">How It Works</h2>
+      <p class="section-sub">Two complementary feature spaces encoded and combined</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card-dark h-100 text-center">
+          <div style="font-size:2.5rem;margin-bottom:12px">🧬</div>
+          <h5 class="text-accent">Gene Encoder</h5>
+          <div class="text-muted small">
+            ESM-2 protein language model generates 480-dim amino acid sequence embeddings
+            per resistance gene — no drug-class information, no leakage.
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card-dark h-100 text-center">
+          <div style="font-size:2.5rem;margin-bottom:12px">💊</div>
+          <h5 class="text-accent">Drug Encoder</h5>
+          <div class="text-muted small">
+            Molecular fingerprints (Morgan 2048 + MACCS 167 + TopoTorsion 1030 = 3245 bits)
+            encode drug chemical structure. Tanimoto similarity measures structural proximity.
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card-dark h-100 text-center">
+          <div style="font-size:2.5rem;margin-bottom:12px">⚡</div>
+          <h5 class="text-accent">Compatibility Score</h5>
+          <div class="text-muted small">
+            Gene and drug embeddings are projected to 128-dim space and scored via dot product.
+            Higher scores predict stronger resistance association.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Quick actions -->
+<section class="py-5">
+  <div class="container-xl text-center">
+    <h2 class="section-title mb-2">Explore the System</h2>
+    <p class="section-sub">Interactive tools for resistance prediction</p>
+    <div class="row g-3 justify-content-center mt-2">
+      <div class="col-md-5">
+        <div class="card-dark">
+          <h5><i class="bi bi-search me-2 text-accent"></i>Gene → Drug Lookup</h5>
+          <p class="text-muted small mb-3">Select a resistance gene (e.g. TEM-1 β-lactamase) and
+          rank all 46 drug classes by predicted resistance score.</p>
+          <a href="/predict" class="btn btn-primary">Start Predicting</a>
+        </div>
+      </div>
+      <div class="col-md-5">
+        <div class="card-dark">
+          <h5><i class="bi bi-flask me-2" style="color:var(--purple)"></i>Novel SMILES Prediction</h5>
+          <p class="text-muted small mb-3">Paste any drug SMILES string — even one not in CARD —
+          and find which resistance genes are most likely to confer resistance.</p>
+          <a href="/predict#smiles" class="btn btn-outline-secondary">Try SMILES Mode</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+fetch('/api/results').then(r=>r.json()).then(data=>{
+  const models = data.models || [];
+  const labels = models.map(m=>m.name.replace('_',' ').replace('feature mlp','Feature-MLP').replace('rgcn bio','R-GCN Bio').replace('biomolamr','BioMolAMR'));
+  const vals   = models.map(m=>m.zs_all_mrr_mean || 0);
+  const colors = vals.map(v => v >= 0.06 ? '#3fb950' : v >= 0.03 ? '#58a6ff' : '#8b949e');
+  const ctx = document.getElementById('homeModelChart');
+  if(!ctx) return;
+  new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets: [{ data: vals, backgroundColor: colors, borderRadius: 6 }] },
+    options: {
+      plugins: { legend: { display: false },
+        annotation: { annotations: { line1: { type:'line', yMin:0.022, yMax:0.022, borderColor:'#d29922', borderWidth:1.5, borderDash:[4,4], label:{content:'Random',display:true,color:'#d29922',font:{size:11}} } } }
+      },
+      scales: {
+        x: { grid:{color:'#30363d'}, ticks:{color:'#8b949e'} },
+        y: { grid:{color:'#30363d'}, ticks:{color:'#8b949e'}, beginAtZero:true, max:0.1 }
+      }
+    }
+  });
+});
+</script>
+{% endblock %}

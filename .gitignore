@@ -1,0 +1,173 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.conda/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+
+# Data files (too large for git)
+data/raw/**/*.csv
+data/raw/**/*.tsv
+data/raw/**/*.fasta
+data/raw/**/*.json
+data/raw/**/*.tar.gz
+data/raw/**/*.tar.bz2
+data/raw/**/*.zip
+data/processed/**/*.pkl
+data/processed/**/*.pt
+data/processed/**/*.h5
+
+# Keep directory structure
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Model checkpoints and logs
+results/models/*.pt
+results/models/*.pth
+results/figures/*.png
+results/figures/*.pdf
+results/tables/*.csv
+experiments/logs/**/*.log
+experiments/logs/**/*.txt
+
+# Weights & Biases
+wandb/
+
+# PyTorch
+*.pth
+*.pt
+
+# TensorBoard
+events.out.tfevents.*
+
+# Coverage
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Environments
+.env
+.venv
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Compressed files
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Logs
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Claude Code — never commit
+CLAUDE.md
+.claude/
+
+# Internal research/paper docs — not for public repo
+COMPLETE_PROJECT_SUMMARY.md
+CONTRIBUTING.md
+EXECUTIVE_PITCH.md
+FINAL_PROJECT_REPORT.md
+FINAL_SUMMARY.md
+PRESENTATION_VISUALS_GUIDE.md
+PROJECT_SUMMARY.md
+QUICK_REFERENCE.md
+RESEARCH_PROPOSAL_PRESENTATION.md
+publication_training.log
+check_implementation.sh
+
+# BioMolAMR model checkpoints + large processed files
+results/biomolamr/models/*.pt
+results/biomolamr/models/*.pth
+data/processed/*.pkl
+data/processed/*.pt
+
+# Keep eval results and figures (small, useful)
+!results/biomolamr/eval_summary.json
+!results/biomolamr/figures/*.png
+!results/biomolamr/figures/*.pdf

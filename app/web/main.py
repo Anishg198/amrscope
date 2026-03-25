@@ -36,6 +36,7 @@ _graph_obj = None
 _splits    = None
 _eval      = None
 _models    = {}   # name → model
+_emb_cache = {}   # name → (gene_emb, drug_emb) pre-computed for compare
 _gene_list = []   # [{idx, name, aro, description}]
 _drug_list = []   # [{idx, name, is_zs}]
 _zs_set    = set()
@@ -43,7 +44,7 @@ _pos_pairs = set()
 
 @app.on_event("startup")
 def startup():
-    global _graph_obj, _splits, _eval, _gene_list, _drug_list, _zs_set, _pos_pairs
+    global _graph_obj, _splits, _eval, _gene_list, _drug_list, _zs_set, _pos_pairs, _emb_cache
 
     print("Loading graph…")
     with open(GRAPH_PATH, "rb") as f:
@@ -77,6 +78,9 @@ def startup():
     # Load models (seed=42)
     print("Loading models…")
     _load_all_models()
+    # Pre-compute embeddings for fast compare
+    print("Pre-computing embeddings…")
+    _precompute_embeddings()
     print("Ready.")
 
 
@@ -110,6 +114,33 @@ def _load_all_models():
         m.eval()
         _models[name] = m
         print(f"  Loaded {name}")
+
+
+def _precompute_embeddings():
+    """Run each GNN model once over the full graph to cache all embeddings."""
+    g = _graph_obj["hetero_data"]
+    n_g  = len(_gene_list)
+    n_dc = len(_drug_list)
+    all_g = torch.arange(n_g,  dtype=torch.long)
+    all_d = torch.arange(n_dc, dtype=torch.long)
+    for mn, m in _models.items():
+        with torch.no_grad():
+            if mn == "feature_mlp":
+                # MLP is already fast — store raw feature matrices
+                _emb_cache[mn] = (g["gene"].x, g["drug_class"].x)
+            else:
+                # For GNNs, run a dummy forward to warm up; scores computed per-request
+                # but cache the full score matrix (n_g x n_dc) at startup
+                try:
+                    scores = np.zeros((n_g, n_dc), dtype=np.float32)
+                    for di in range(n_dc):
+                        s = m(g, all_g, torch.full((n_g,), di, dtype=torch.long))
+                        scores[:, di] = s.cpu().numpy()
+                    _emb_cache[mn] = scores
+                    print(f"  Cached {mn} score matrix")
+                except Exception as e:
+                    print(f"  Could not cache {mn}: {e}")
+                    _emb_cache[mn] = None
 
 
 def _score(model_name, gene_indices, drug_indices):
@@ -273,8 +304,10 @@ def predict_smiles(req: SmilesRequest):
             raise HTTPException(400, "Invalid SMILES")
         morgan = list(AllChem.GetMorganFingerprintAsBitVect(mol, radius=2, nBits=2048))
         maccs  = list(MACCSkeys.GenMACCSKeys(mol))
-        topo   = list(Torsions.GetTopologicalTorsionFingerprintAsIntVect(mol))
-        topo_b = [1 if x > 0 else 0 for x in topo]
+        # Use GetNonzeroElements() to avoid iterating the full sparse hash space
+        topo_sparse = Torsions.GetTopologicalTorsionFingerprintAsIntVect(mol)
+        topo_nz     = topo_sparse.GetNonzeroElements()
+        topo_b      = [1 if v > 0 else 0 for v in topo_nz.values()]
         fp     = (morgan + maccs + topo_b)[:3245]
         fp    += [0] * max(0, 3245 - len(fp))
         fp_t   = torch.tensor(fp, dtype=torch.float32)
@@ -335,8 +368,17 @@ def predict_compare(req: CompareRequest):
     n_dc = len(_drug_list)
     result = {}
     for mn in _models:
-        scores = _score(mn, [req.gene_idx]*n_dc, list(range(n_dc)))
-        order  = np.argsort(scores)[::-1]
+        cache = _emb_cache.get(mn)
+        if mn == "feature_mlp":
+            # Use cached feature matrices — fast MLP
+            scores = _score(mn, [req.gene_idx]*n_dc, list(range(n_dc)))
+        elif isinstance(cache, np.ndarray):
+            # Use pre-computed full score matrix
+            scores = cache[req.gene_idx]
+        else:
+            # Fallback: compute on-the-fly
+            scores = _score(mn, [req.gene_idx]*n_dc, list(range(n_dc)))
+        order = np.argsort(scores)[::-1]
         result[mn] = [{"dc_idx": int(i), "name": _drug_list[i]["name"],
                         "score": float(scores[i]), "is_zs": _drug_list[i]["is_zs"]}
                       for i in order[:20]]

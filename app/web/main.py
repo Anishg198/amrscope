@@ -211,7 +211,51 @@ def api_drugs(q: str = ""):
 
 @app.get("/api/results")
 def api_results():
-    return _eval
+    """Transform eval_summary.json into the shape the frontend expects."""
+    if not _eval:
+        return {"models": [], "per_class_feature_mlp": {}}
+
+    MODEL_TYPE = {
+        "feature_mlp": "mlp", "fmlp_gene_zero": "mlp", "fmlp_drug_zero": "mlp", "fmlp_leaky": "mlp",
+        "rgcn_bio": "graph", "biomolamr": "graph", "amrscope": "graph",
+        "distmult": "graph", "transe": "graph",
+    }
+    DISPLAY = {
+        "feature_mlp": "Feature MLP", "rgcn_bio": "R-GCN Bio",
+        "biomolamr": "AMRScope", "amrscope": "AMRScope",
+        "distmult": "DistMult", "transe": "TransE",
+        "fmlp_gene_zero": "FMLP: gene=0", "fmlp_drug_zero": "FMLP: drug=0",
+        "fmlp_leaky": "FMLP: leaky",
+    }
+    # Only show main models, not ablations, in the table
+    main_models = ["feature_mlp", "distmult", "rgcn_bio", "biomolamr", "transe"]
+    models_out = []
+    for mn in main_models:
+        if mn not in _eval:
+            continue
+        e = _eval[mn]
+        models_out.append({
+            "name":               DISPLAY.get(mn, mn),
+            "type":               MODEL_TYPE.get(mn, "other"),
+            "test_mrr_mean":      round(e.get("test",{}).get("mrr",{}).get("mean", 0), 4),
+            "test_mrr_std":       round(e.get("test",{}).get("mrr",{}).get("std",  0), 4),
+            "zs_within_mrr_mean": round(e.get("zs_within",{}).get("mrr",{}).get("mean", 0), 4),
+            "zs_within_mrr_std":  round(e.get("zs_within",{}).get("mrr",{}).get("std",  0), 4),
+            "zs_all_mrr_mean":    round(e.get("zs_all",{}).get("mrr",{}).get("mean", 0), 4),
+            "zs_all_mrr_std":     round(e.get("zs_all",{}).get("mrr",{}).get("std",  0), 4),
+            "precision_at_20_mean": round(e.get("zs_all",{}).get("hits@10",{}).get("mean", 0), 4),
+        })
+    # Per-class breakdown for Feature-MLP
+    per_class = {}
+    fmlp = _eval.get("feature_mlp", {})
+    for dc, v in fmlp.get("per_dc_zs_all", {}).items():
+        if isinstance(v, dict):
+            val = v.get("mrr", v.get("mean", 0))
+        else:
+            val = v
+        per_class[dc] = round(float(val), 4)
+
+    return {"models": models_out, "per_class_feature_mlp": per_class}
 
 @app.get("/api/summary_stats")
 def api_summary():

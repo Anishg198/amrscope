@@ -177,7 +177,8 @@ fetch('/api/results').then(r=>r.json()).then(data=>{
     const zsWin = m.zs_within_mrr_mean!=null ? m.zs_within_mrr_mean.toFixed(3)+(m.zs_within_mrr_std!=null?` ± ${m.zs_within_mrr_std.toFixed(3)}`:'') : '—';
     const testMrr = m.test_mrr_mean!=null ? m.test_mrr_mean.toFixed(3) : '—';
     const pat20 = m.precision_at_20_mean!=null ? m.precision_at_20_mean.toFixed(3) : '—';
-    const typeTag = (m.type||'').includes('graph') ? '<span class="tag tag-zs">GNN</span>' : '<span class="tag tag-tp">MLP</span>';
+    const typeMap = {graph:'<span class="tag tag-zs">GNN</span>', mlp:'<span class="tag tag-tp">MLP</span>', 'cross-attn':'<span class="tag" style="background:rgba(98,0,234,.2);color:#b388ff">Cross-Attn</span>'};
+    const typeTag = typeMap[m.type] || '<span class="tag tag-tp">MLP</span>';
     tr.innerHTML=`<td><strong>${m.name||'?'}</strong></td><td>${typeTag}</td><td>${testMrr}</td><td>${zsWin}</td><td>${isBest?`<strong>${zsAll}</strong>`:zsAll}</td><td>${pat20}</td>`;
     tbody.appendChild(tr);
   });

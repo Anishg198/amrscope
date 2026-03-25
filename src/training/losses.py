@@ -193,6 +193,48 @@ class PrototypeContrastiveLoss(nn.Module):
         return self.prototypes.weight.detach()
 
 
+# ─── 5. InfoNCE Loss ─────────────────────────────────────────────────────────
+
+class InfoNCELoss(nn.Module):
+    """
+    All-class InfoNCE contrastive loss for AMR gene-drug prediction.
+
+    For each positive (gene, drug^+) pair in the batch:
+      - score the gene embedding against ALL M drug class embeddings
+      - treat drug^+ as the target class (multi-class cross-entropy)
+      - minimize  -log( exp(s(g, d^+)/τ) / Σ_j exp(s(g, d_j)/τ) )
+
+    With M=46 CARD drug classes, every other drug class acts as a hard negative.
+    This forces gene embeddings into a metric space where similarity to a drug
+    directly reflects resistance probability — enabling zero-shot generalization
+    to unseen drug classes via their molecular fingerprint embeddings.
+
+    Reference: ConPLex (PNAS 2023) uses a similar contrastive objective for
+    zero-shot drug-target interaction; first application to AMR on CARD.
+    """
+
+    def __init__(self, temperature: float = 0.07):
+        super().__init__()
+        self.tau = temperature
+
+    def forward(
+        self,
+        gene_emb: torch.Tensor,      # [B, D]  L2-normalised gene embeddings
+        all_drug_emb: torch.Tensor,  # [M, D]  L2-normalised drug embeddings (all M classes)
+        pos_drug_idx: torch.Tensor,  # [B]     long — target drug class index per gene
+    ) -> torch.Tensor:
+        """
+        Computes all-class InfoNCE.
+
+        gene_emb     : (B, D) — batch of gene embeddings, L2-normalised
+        all_drug_emb : (M, D) — all M drug class embeddings, L2-normalised
+        pos_drug_idx : (B,)   — index into all_drug_emb for the positive drug
+        """
+        # [B, M] logit matrix (dot products already in [-1, 1] after L2-norm)
+        logits = (gene_emb @ all_drug_emb.T) / self.tau  # (B, M)
+        return F.cross_entropy(logits, pos_drug_idx)
+
+
 # ─── Combined Loss ────────────────────────────────────────────────────────────
 
 class BioMolAMRLoss(nn.Module):

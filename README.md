@@ -23,7 +23,7 @@ AMRScope is a **local web platform** for zero-shot antimicrobial resistance (AMR
 It combines:
 - **ESM-2** protein language model embeddings for resistance genes (480-dim)
 - **Molecular fingerprints** (Morgan 2048 + MACCS 167 + TopoTorsion 1030 = 3245-bit) for drug chemical structure
-- **Three trained models** spanning MLP, relational GCN, and heterogeneous GAT architectures
+- **Four trained models** — from a novel cross-attention architecture to MLP and GCN baselines
 - Built on **CARD v3.2.6** — 6,397 resistance genes, 46 antibiotic drug classes
 
 ---
@@ -35,7 +35,7 @@ It combines:
 | 🔍 | **Gene → Drug** | Search any resistance gene, rank all 46 drug classes by predicted resistance score |
 | 💊 | **Drug → Gene** | Type any antibiotic class, find top resistance genes with confidence metrics |
 | 🧪 | **Novel SMILES** | Paste any drug SMILES — even unknown drugs — and get resistance gene predictions |
-| 📊 | **Model Comparison** | Run all 3 models side-by-side on the same gene, compare rankings instantly |
+| 📊 | **Model Comparison** | Run all 4 models side-by-side on the same gene, compare rankings instantly |
 | ✅ | **Verdict System** | Plain-language confidence verdict with TP recovery stats after every prediction |
 | 📈 | **Results Dashboard** | Full evaluation metrics, ablation study tables, and publication figures |
 
@@ -43,22 +43,27 @@ It combines:
 
 ## Models
 
-### 🥇 Feature MLP
-A 2-layer MLP that scores gene–drug pairs using ESM-2 protein embeddings and molecular fingerprints — no graph. Best zero-shot performance (ZS-all MRR **0.069**, 3.1× random).
+### ★ CrossContrastAMR *(best)*
+Novel cross-attention architecture — gene encoder (ESM-2 → MLP → 128-dim) queries over all 46 drug class representations (4-head attention), conditioned on drug structural similarity (Tanimoto alignment loss). First cross-attention model for zero-shot AMR on CARD. ZS-all MRR **0.090 ± 0.012**, **4.1× random**.
+
+### 🥈 Feature MLP
+A 2-layer MLP that scores gene–drug pairs using ESM-2 protein embeddings and molecular fingerprints — no graph. ZS-all MRR **0.069 ± 0.006**, 3.1× random.
 
 ### 🔷 R-GCN Bio
 Relational Graph Convolutional Network over the full CARD heterogeneous knowledge graph (genes, drug classes, resistance mechanisms). Typed edge convolutions per relation.
 
-### 🔶 AMRScope
+### 🔶 AMRScope (GAT)
 Heterogeneous Graph Attention Network — gene encoder (ESM-2 → GAT), drug encoder (MolFP → GraphSAGE over Tanimoto similarity graph), mechanism-weighted decoder.
 
 | Model | ZS-all MRR | vs. Random (0.022) |
 |---|---|---|
-| Feature MLP | **0.069 ± 0.006** | **3.1×** |
+| **CrossContrastAMR** | **0.090 ± 0.012** | **4.1×** |
+| Feature MLP | 0.069 ± 0.006 | 3.1× |
 | R-GCN Bio | 0.027 ± 0.001 | 1.2× |
-| AMRScope | 0.019 ± 0.001 | ~1× |
+| AMRScope (GAT) | 0.019 ± 0.001 | ~1× |
 
 > *ZS-all MRR: rank the zero-shot drug class among all 46 classes. Random baseline = 1/46 ≈ 0.022.*
+> *CrossContrastAMR: 4 seeds. All other models: 5 seeds.*
 
 ---
 

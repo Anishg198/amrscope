@@ -23,15 +23,16 @@
           and inflating zero-shot MRR by 5.7×.
         </p>
         <p class="small" style="line-height:1.75;color:var(--text)">
-          With this leakage removed, we show that clean pairwise compatibility scoring between
-          ESM-2 protein embeddings and molecular fingerprints (Feature-MLP) achieves ZS-all MRR 0.069 —
-          3.1× above a random baseline of 0.022 — outperforming graph neural network architectures including
-          our proposed AMRScope heterogeneous GAT model.
+          With this leakage removed, we propose <strong>CrossContrastAMR</strong> — the first cross-attention
+          architecture for zero-shot AMR on CARD. Gene representations (ESM-2 → MLP → 128-dim) attend over all
+          46 drug class embeddings via 4-head cross-attention; a drug structural alignment loss
+          (embedding cosine similarity ≈ Tanimoto fingerprint similarity) forces the learned drug space to
+          preserve chemical structure, enabling zero-shot transfer to novel drug classes.
+          CrossContrastAMR achieves ZS-all MRR <strong>0.090 ± 0.012</strong> (4.1× random) — a 30% improvement
+          over the Feature-MLP baseline (0.069, 3.1× random) — while graph neural network approaches
+          including R-GCN and the heterogeneous GAT model remain near random.
           Ablation confirms both ESM-2 gene embeddings and molecular drug fingerprints are jointly necessary;
-          removing either feature modality collapses performance to or below random.
-          These results demonstrate that direct protein–chemical compatibility is sufficient and dominant
-          for zero-shot AMR transfer; graph topology, while biologically motivated, provides no additional benefit
-          on the current CARD knowledge graph.
+          the structural alignment constraint is key to zero-shot generalization.
         </p>
       </div>
 
@@ -88,11 +89,18 @@
             </thead>
             <tbody>
               <tr class="best">
-                <td><strong>Feature-MLP</strong></td>
+                <td><strong>CrossContrastAMR ★</strong></td>
+                <td><span class="tag" style="background:rgba(98,0,234,.2);color:#b388ff">Cross-Attn</span></td>
+                <td>ESM-2 480d + cross-attn</td>
+                <td>MolFP 3245d + Tanimoto align</td>
+                <td class="text-green"><strong>0.090 ± 0.012</strong></td>
+              </tr>
+              <tr>
+                <td>Feature-MLP</td>
                 <td><span class="tag tag-tp">MLP</span></td>
                 <td>ESM-2 480d</td>
                 <td>MolFP 3245d</td>
-                <td class="text-green"><strong>0.069</strong></td>
+                <td>0.069 ± 0.006</td>
               </tr>
               <tr>
                 <td>DistMult</td>

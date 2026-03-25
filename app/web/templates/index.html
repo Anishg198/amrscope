@@ -32,8 +32,8 @@
       <div class="col-lg-5 d-none d-lg-block">
         <div class="card-dark text-center py-4">
           <div class="mb-2 text-muted small text-uppercase" style="letter-spacing:.8px">Primary Metric · ZS-all MRR</div>
-          <div style="font-size:3.5rem;font-weight:800;color:var(--green)">0.069</div>
-          <div class="text-muted small">Feature-MLP · Best Model · 3.1× random</div>
+          <div style="font-size:3.5rem;font-weight:800;color:var(--green)">0.090</div>
+          <div class="text-muted small">CrossContrastAMR · Best Model · 4.1× random</div>
           <hr>
           <div class="row g-2 mt-1">
             <div class="col-6">
@@ -42,9 +42,9 @@
               <div class="text-muted" style="font-size:.72rem">leaky features</div>
             </div>
             <div class="col-6">
-              <div class="text-muted small">Clean evaluation</div>
-              <div style="color:var(--green);font-weight:700">0.069</div>
-              <div class="text-muted" style="font-size:.72rem">this work</div>
+              <div class="text-muted small">Clean best model</div>
+              <div style="color:var(--green);font-weight:700">0.090</div>
+              <div class="text-muted" style="font-size:.72rem">CrossContrastAMR</div>
             </div>
           </div>
         </div>
@@ -77,7 +77,7 @@
       </div>
       <div class="col-6 col-md-3">
         <div class="stat-card">
-          <div class="stat-num" style="color:var(--yellow)">3</div>
+          <div class="stat-num" style="color:var(--yellow)">4</div>
           <div class="stat-label">Models Evaluated</div>
         </div>
       </div>
@@ -104,20 +104,22 @@
 
         <div class="callout-green mb-3">
           <div class="fw-700 mb-1" style="font-weight:700;color:var(--green)">
-            <i class="bi bi-check-circle me-2"></i>Clean Evaluation: ESM-2 + Mol Fingerprints
+            <i class="bi bi-check-circle me-2"></i>CrossContrastAMR: Cross-Attention + Structural Alignment
           </div>
-          <div class="small">With protein language model embeddings (ESM-2) and molecular
-          fingerprints (Morgan + MACCS + TopoTorsion), Feature-MLP achieves ZS-all MRR 0.069 —
-          <strong>3.1× above random (0.022)</strong>, genuine zero-shot transfer.</div>
+          <div class="small">Gene representations (ESM-2 → MLP → 128-dim) attend over all 46 drug class
+          embeddings via cross-attention. A Tanimoto structural alignment loss forces the drug space to
+          preserve chemical similarity — enabling true zero-shot transfer. ZS-all MRR <strong>0.090</strong>
+          — <strong>4.1× above random (0.022)</strong>, 30% over the Feature-MLP baseline.</div>
         </div>
 
         <div class="callout-blue">
           <div class="fw-700 mb-1" style="color:var(--accent);font-weight:700">
-            <i class="bi bi-lightbulb me-2"></i>Pairwise Compatibility Is Sufficient
+            <i class="bi bi-lightbulb me-2"></i>Why Cross-Attention Works for Zero-Shot AMR
           </div>
-          <div class="small">Graph topology provides no additional benefit. Direct protein–chemical
-          compatibility scoring outperforms all GNN architectures including the proposed
-          AMRScope GAT model. Both feature types are jointly necessary.</div>
+          <div class="small">The structural alignment loss ensures chemically similar drugs cluster together
+          in embedding space. When a novel drug appears at test time, its fingerprint embedding lands near
+          training drugs with similar structure — genes that attended to those drugs naturally score it correctly.
+          Graph topology (GNNs) adds no additional benefit.</div>
         </div>
       </div>
 

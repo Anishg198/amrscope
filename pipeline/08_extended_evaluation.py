@@ -38,6 +38,7 @@ sys.path.insert(0, str(ROOT))
 
 from src.models.biomolamr import BioMolAMR
 from src.models.baselines  import DistMultBaseline, TransEBaseline, FeatureMLPBaseline, RGCNBaseline
+from src.models.crossamr   import CrossContrastAMR
 
 MODELS_DIR = ROOT / "results/biomolamr/models"
 TABLES_DIR = ROOT / "results/biomolamr/tables"
@@ -51,7 +52,7 @@ SPLITS_EXT = ROOT / "data/processed/extended_splits.pkl"
 SPLITS_STD = ROOT / "data/processed/splits.pkl"
 TAN_FILE   = ROOT / "data/processed/drug_tanimoto.pt"
 
-MODEL_NAMES = ["biomolamr", "rgcn_bio", "feature_mlp", "distmult", "transe",
+MODEL_NAMES = ["crossamr", "feature_mlp", "biomolamr", "rgcn_bio", "distmult", "transe",
                "fmlp_gene_zero", "fmlp_drug_zero", "fmlp_leaky"]
 METRICS     = ["mrr", "hits@1", "hits@3", "hits@10"]
 
@@ -61,6 +62,7 @@ plt.rcParams.update({
     "figure.dpi": 150, "savefig.dpi": 300, "savefig.bbox": "tight",
 })
 COLORS = {
+    "crossamr":    "#6200ea",
     "biomolamr":   "#e63946",
     "rgcn_bio":    "#ff7f0e",
     "feature_mlp": "#2ca02c",
@@ -68,7 +70,8 @@ COLORS = {
     "transe":      "#9467bd",
 }
 LABELS = {
-    "biomolamr":   "BioMolAMR (ours)",
+    "crossamr":    "CrossContrastAMR (ours)",
+    "biomolamr":   "AMRScope (GAT)",
     "rgcn_bio":    "R-GCN (bio graph)",
     "feature_mlp": "Feature-MLP",
     "distmult":    "DistMult†",
@@ -101,7 +104,10 @@ def build_model_from_ck(model_name, ck, graph):
     n_genes  = graph["gene"].x.shape[0]
     n_dc     = graph["drug_class"].x.shape[0]
 
-    if model_name == "biomolamr":
+    if model_name == "crossamr":
+        m = CrossContrastAMR(gene_dim, drug_dim,
+                             hp["hidden_dim"], hp["n_heads"], hp["dropout"])
+    elif model_name == "biomolamr":
         m = BioMolAMR(gene_dim, drug_dim, mech_dim,
                       hp["hidden_dim"], hp["out_dim"],
                       hp["num_heads"], hp["num_gat_layers"], hp["dropout"])
@@ -131,6 +137,10 @@ def score_all_pairs(model_name, model, graph, gene_idx, drug_idx, device,
             return model(graph, gene_idx, drug_idx)
         elif model_name in ("distmult", "transe"):
             return model(gene_idx, drug_idx)
+        elif model_name == "crossamr":
+            gx = graph["gene"].x
+            dx = graph["drug_class"].x
+            return model(gx, dx, gene_idx, drug_idx)
         else:
             # feature_mlp and all fmlp_* ablations
             gx = gene_x_override if gene_x_override is not None else graph["gene"].x

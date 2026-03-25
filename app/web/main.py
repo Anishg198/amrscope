@@ -87,15 +87,17 @@ def startup():
 def _load_all_models():
     from src.models.baselines  import FeatureMLPBaseline, RGCNBaseline
     from src.models.biomolamr  import BioMolAMR as AMRScope
+    from src.models.crossamr   import CrossContrastAMR
 
     g = _graph_obj["hetero_data"]
     g_dim, d_dim, m_dim = (g["gene"].x.shape[1], g["drug_class"].x.shape[1],
                            g["mechanism"].x.shape[1])
 
     specs = {
-        "feature_mlp": MODELS_DIR / "feature_mlp_seed42.pt",
-        "rgcn_bio":    MODELS_DIR / "rgcn_bio_seed42.pt",
-        "amrscope":   MODELS_DIR / "biomolamr_seed42.pt",
+        "feature_mlp":    MODELS_DIR / "feature_mlp_seed42.pt",
+        "rgcn_bio":       MODELS_DIR / "rgcn_bio_seed42.pt",
+        "amrscope":       MODELS_DIR / "biomolamr_seed42.pt",
+        "crossamr":       MODELS_DIR / "crossamr_seed42.pt",
     }
     for name, path in specs.items():
         if not path.exists():
@@ -107,6 +109,8 @@ def _load_all_models():
             m = FeatureMLPBaseline(g_dim, d_dim, hp["hidden_dim"], hp["dropout"])
         elif name == "rgcn_bio":
             m = RGCNBaseline(g_dim, d_dim, m_dim, hp["hidden_dim"], hp["out_dim"], hp["dropout"])
+        elif name == "crossamr":
+            m = CrossContrastAMR(g_dim, d_dim, hp["hidden_dim"], hp["n_heads"], hp["dropout"])
         else:
             m = AMRScope(g_dim, d_dim, m_dim, hp["hidden_dim"], hp["out_dim"],
                           hp["num_heads"], hp["num_gat_layers"], hp["dropout"])
@@ -117,20 +121,29 @@ def _load_all_models():
 
 
 def _precompute_embeddings():
-    """Run each GNN model once over the full graph to cache all embeddings."""
+    """Run each model once over the full graph to cache all scores."""
     g = _graph_obj["hetero_data"]
     n_g  = len(_gene_list)
     n_dc = len(_drug_list)
     all_g = torch.arange(n_g,  dtype=torch.long)
-    all_d = torch.arange(n_dc, dtype=torch.long)
     for mn, m in _models.items():
         with torch.no_grad():
             if mn == "feature_mlp":
                 # MLP is already fast — store raw feature matrices
                 _emb_cache[mn] = (g["gene"].x, g["drug_class"].x)
+            elif mn == "crossamr":
+                # Use CrossContrastAMR's chunked full-matrix method
+                try:
+                    score_mat = m.compute_all_scores(
+                        g["gene"].x, g["drug_class"].x, chunk_size=512
+                    ).cpu().numpy()  # [N_genes, 46]
+                    _emb_cache[mn] = score_mat
+                    print(f"  Cached {mn} score matrix {score_mat.shape}")
+                except Exception as e:
+                    print(f"  Could not cache {mn}: {e}")
+                    _emb_cache[mn] = None
             else:
-                # For GNNs, run a dummy forward to warm up; scores computed per-request
-                # but cache the full score matrix (n_g x n_dc) at startup
+                # For GNNs, cache the full score matrix (n_g x n_dc)
                 try:
                     scores = np.zeros((n_g, n_dc), dtype=np.float32)
                     for di in range(n_dc):
@@ -150,7 +163,7 @@ def _score(model_name, gene_indices, drug_indices):
     gt = torch.tensor(gene_indices, dtype=torch.long)
     dt = torch.tensor(drug_indices,  dtype=torch.long)
     with torch.no_grad():
-        if model_name == "feature_mlp":
+        if model_name in ("feature_mlp", "crossamr"):
             s = m(g["gene"].x, g["drug_class"].x, gt, dt)
         elif model_name == "rgcn_bio":
             s = m(g, gt, dt)
@@ -217,10 +230,12 @@ def api_results():
 
     MODEL_TYPE = {
         "feature_mlp": "mlp", "fmlp_gene_zero": "mlp", "fmlp_drug_zero": "mlp", "fmlp_leaky": "mlp",
+        "crossamr": "cross-attn",
         "rgcn_bio": "graph", "biomolamr": "graph", "amrscope": "graph",
         "distmult": "graph", "transe": "graph",
     }
     DISPLAY = {
+        "crossamr": "CrossContrastAMR",
         "feature_mlp": "Feature MLP", "rgcn_bio": "R-GCN Bio",
         "biomolamr": "AMRScope", "amrscope": "AMRScope",
         "distmult": "DistMult", "transe": "TransE",
@@ -228,7 +243,7 @@ def api_results():
         "fmlp_leaky": "FMLP: leaky",
     }
     # Only show main models, not ablations, in the table
-    main_models = ["feature_mlp", "distmult", "rgcn_bio", "biomolamr", "transe"]
+    main_models = ["crossamr", "feature_mlp", "distmult", "rgcn_bio", "biomolamr", "transe"]
     models_out = []
     for mn in main_models:
         if mn not in _eval:

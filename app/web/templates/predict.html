@@ -27,7 +27,15 @@
         <label class="form-label">Model</label>
         <select class="form-select" id="globalModel">
           {% for m in models %}
-          <option value="{{ m }}">{{ m.replace('_',' ').title() }}</option>
+          <option value="{{ m }}"
+            {% if m == 'crossamr' %}style="font-weight:700"{% endif %}>
+            {%- if m == 'crossamr' -%}★ CrossContrastAMR (best)
+            {%- elif m == 'feature_mlp' -%}Feature MLP
+            {%- elif m == 'rgcn_bio' -%}R-GCN Bio
+            {%- elif m == 'amrscope' -%}AMRScope (GAT)
+            {%- else -%}{{ m.replace('_',' ').title() }}
+            {%- endif -%}
+          </option>
           {% endfor %}
           {% if not models %}
           <option value="feature_mlp">Feature MLP</option>
@@ -36,7 +44,7 @@
       </div>
       <div class="col-md-8">
         <div class="d-flex flex-wrap gap-2 align-items-center mt-3 mt-md-4">
-          <span class="badge-zs">ZS-all MRR best: 0.069</span>
+          <span class="badge-zs" id="bestMrrBadge">ZS-all MRR best: 0.090 (CrossContrastAMR)</span>
           <span class="text-muted small">· 46 drug classes · 6,397 genes · 12 ZS held-out</span>
         </div>
       </div>
